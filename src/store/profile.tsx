@@ -6,6 +6,9 @@ import {AppState} from '.';
 const LOAD_PROFILE_START = 'LOAD_PROFILE_START';
 const LOAD_PROFILE_SUCCESS = 'LOAD_PROFILE_SUCCESS';
 const LOAD_PROFILE_FAILURE = 'LOAD_PROFILE_FAILURE';
+const UPLOAD_AVATAR_START = 'UPLOAD_AVATAR_START';
+const UPLOAD_AVATAR_SUCCESS = 'UPLOAD_AVATAR_SUCCESS';
+const UPLOAD_AVATAR_FAILURE = 'UPLOAD_AVATAR_FAILURE';
 
 export interface Profile {
   name: string;
@@ -34,7 +37,29 @@ interface LoadProfileFailureAction {
   isLoading: boolean;
 }
 
-export type ProfileActionTypes = LoadProfileStartAction | LoadProfileSuccessAction | LoadProfileFailureAction;
+interface UploadAvatarStartAction {
+  type: typeof UPLOAD_AVATAR_START;
+  isLoading: boolean;
+}
+
+interface UploadAvatarSuccessAction {
+  type: typeof UPLOAD_AVATAR_SUCCESS;
+  avatarUrl: string;
+  isLoading: boolean;
+}
+
+interface UploadAvatarFailureAction {
+  type: typeof UPLOAD_AVATAR_FAILURE;
+  isLoading: boolean;
+}
+
+export type ProfileActionTypes =
+  | LoadProfileStartAction
+  | LoadProfileSuccessAction
+  | LoadProfileFailureAction
+  | UploadAvatarStartAction
+  | UploadAvatarSuccessAction
+  | UploadAvatarFailureAction;
 
 export const actionCreators = {
   getProfile: () => {
@@ -66,6 +91,25 @@ export const actionCreators = {
         });
     };
   },
+  uploadAvatar: (fileBase64: string, fileType: string, fileName: string) => async (dispatch: ThunkDispatch<{}, {}, any>): Promise<void> => {
+    dispatch({type: UPLOAD_AVATAR_START, isLoading: true});
+
+    var data = {
+      imageBase64: fileBase64,
+      fileType: fileType,
+      fileName: fileName,
+    };
+
+    return axios
+      .post('/profile/avatar', data)
+      .then(function(response: any) {
+        dispatch({type: UPLOAD_AVATAR_SUCCESS, avatarUrl: response.data.avatarUrl, isLoading: false});
+      })
+      .catch(function(error) {
+        dispatch({type: UPLOAD_AVATAR_FAILURE, isLoading: false});
+        console.log(error);
+      });
+  },
 };
 
 const initialState: ProfileState = {
@@ -84,6 +128,12 @@ export const reducer = (state = initialState, action: ProfileActionTypes): Profi
     case LOAD_PROFILE_SUCCESS:
       return {...state, isLoading: action.isLoading, profile: action.profile};
     case LOAD_PROFILE_FAILURE:
+      return {...state, isLoading: action.isLoading};
+    case UPLOAD_AVATAR_START:
+      return {...state, isLoading: action.isLoading};
+    case UPLOAD_AVATAR_SUCCESS:
+      return {...state, isLoading: action.isLoading, profile: {...state.profile, avatarUrl: action.avatarUrl}};
+    case UPLOAD_AVATAR_FAILURE:
       return {...state, isLoading: action.isLoading};
     default:
       return state;
