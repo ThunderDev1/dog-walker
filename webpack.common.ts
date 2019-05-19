@@ -52,8 +52,8 @@ const config: webpack.Configuration = {
       chunks: ['silentRenew'],
     }),
     new WebpackPwaManifest({
-      name: 'Dog Walker',
-      short_name: 'DogWk',
+      name: 'Nova',
+      short_name: 'Nova',
       description: 'Application pour balader son chien',
       background_color: '#ffffff',
       crossorigin: 'anonymous',
