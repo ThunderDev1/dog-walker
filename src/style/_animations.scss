@@ -1,0 +1,15 @@
+@keyframes fadeIn {
+  0% {
+      opacity: 0;
+  }
+
+  100% {
+      opacity: 1;
+  }
+}
+
+@mixin fadeIn {
+  animation-duration: 0.4s;
+  animation-name: fadeIn;
+  animation-timing-function: ease-out;
+}

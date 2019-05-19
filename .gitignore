@@ -1,0 +1,12 @@
+.idea
+.DS_store
+**/node_modules
+dist
+dist-demo
+coverage
+.build
+.env
+.vscode
+lib
+publish.ps1
+webpack.prod.ts
