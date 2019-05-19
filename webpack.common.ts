@@ -43,6 +43,7 @@ const config: webpack.Configuration = {
   plugins: [
     new HtmlWebPackPlugin({
       template: './index.html',
+      favicon: 'favicon.ico',
       chunks: ['main'],
     }),
     new HtmlWebPackPlugin({
