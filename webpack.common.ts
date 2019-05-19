@@ -1,5 +1,8 @@
+/* eslint @typescript-eslint/camelcase: 0 */
 import * as webpack from 'webpack';
 import * as HtmlWebPackPlugin from 'html-webpack-plugin';
+import * as WebpackPwaManifest from 'webpack-pwa-manifest';
+import * as path from 'path';
 
 const config: webpack.Configuration = {
   entry: {
@@ -47,6 +50,19 @@ const config: webpack.Configuration = {
       filename: 'silentRenew.html',
       chunks: ['silentRenew'],
     }),
+    new WebpackPwaManifest({
+      name: 'Dog Walker',
+      short_name: 'DogWk',
+      description: 'Application pour balader son chien',
+      background_color: '#ffffff',
+      crossorigin: 'anonymous',
+      icons: [
+        {
+          src: path.resolve('src/assets/icon.png'),
+          sizes: [96, 128, 192, 256, 384, 512] // multiple sizes
+        },
+      ]
+    })
   ],
 };
 
