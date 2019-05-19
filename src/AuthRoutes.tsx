@@ -3,7 +3,7 @@ import MapContainer from './containers/MapContainer';
 import * as React from 'react';
 import {Route, Switch} from 'react-router-dom';
 import {User} from 'oidc-client';
-import UserInfo from './components/UserInfo';
+import UserProfile from './components/UserProfile';
 import Contact from './components/Contact';
 import {initAxios} from './utils/startupHelper';
 
@@ -19,7 +19,7 @@ const AuthRoutes = (props: AuthRoutesProps) => {
     <React.Fragment>
       <Switch>
         <Route exact path="/" component={MapContainer} />
-        <Route path="/user" component={UserInfo} />
+        <Route path="/user" component={UserProfile} />
         <Route path="/contact" component={Contact} />
       </Switch>
 
