@@ -14,6 +14,7 @@ const defaultMapProps: Partial<MapboxOptions> = {
   zoom: 14,
   minZoom: 3,
   maxZoom: 18,
+  pitchWithRotate: false,
 };
 
 interface DispatchProps {
@@ -83,7 +84,7 @@ export default class Map extends React.Component<MapProps, MapState> {
         },
         paint: {},
       });
-      this.map.on('contextmenu', e => {
+      this.map.on('click', e => {
         this.addPlaceMarker.remove();
         this.addPlaceMarker = new mapboxgl.Marker().setLngLat(e.lngLat).addTo(this.map);
         this.setState({showAddModal: true});
