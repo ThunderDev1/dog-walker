@@ -5,7 +5,10 @@
   "scripts": {
     "start": "webpack-dev-server --port 5100 --config webpack.dev.ts",
     "build": "webpack --config webpack.prod.ts",
-    "lint": "./node_modules/eslint/bin/eslint"
+    "lint": "./node_modules/eslint/bin/eslint",
+    "azUpload": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./publish.ps1",
+    "publish": "npm run build && npm run azUpload"
+
   },
   "author": "ThunderDev1",
   "license": "ISC",
