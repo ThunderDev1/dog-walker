@@ -9,6 +9,7 @@ export interface Friend {
   id: string;
   name: string;
   avatarUrl: string;
+  description: string;
 }
 
 export interface FriendListState {

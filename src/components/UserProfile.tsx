@@ -9,12 +9,14 @@ interface DispatchProps {
   getProfile: () => void;
   uploadAvatar: (fileBase64: string, fileType: string, fileName: string) => Promise<void>;
   submitName: (name: string) => void;
+  submitDescription: (description: string) => void;
 }
 
 type UserProfileProps = ProfileStore.ProfileState & DispatchProps;
 
 const UserProfile = (props: UserProfileProps) => {
   const nameRef = useRef<HTMLInputElement>(null);
+  const descRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     props.getProfile();
@@ -48,6 +50,15 @@ const UserProfile = (props: UserProfileProps) => {
                 <i className="form-icon loading" />
               ) : (
                 <i className="form-icon icon icon-check" onClick={() => nameRef.current && props.submitName(nameRef.current.value)} />
+              )}
+            </div>
+            <label className="form-label">Description</label>
+            <div className="has-icon-right">
+              <input type="text" ref={descRef} className="form-input" defaultValue={props.profile.description} placeholder="ex: Chien plein d'énergie" />
+              {props.isNameLoading ? (
+                <i className="form-icon loading" />
+              ) : (
+                <i className="form-icon icon icon-check" onClick={() => descRef.current && props.submitDescription(descRef.current.value)} />
               )}
             </div>
             <label className="form-label">Email</label>

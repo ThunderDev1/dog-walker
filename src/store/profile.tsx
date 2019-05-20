@@ -14,16 +14,22 @@ const UPDATE_NAME_START = 'UPDATE_NAME_START';
 const UPDATE_NAME_SUCCESS = 'UPDATE_NAME_SUCCESS';
 const UPDATE_NAME_FAILURE = 'UPDATE_NAME_FAILURE';
 
+const UPDATE_DESCRIPTION_START = 'UPDATE_DESCRIPTION_START';
+const UPDATE_DESCRIPTION_SUCCESS = 'UPDATE_DESCRIPTION_SUCCESS';
+const UPDATE_DESCRIPTION_FAILURE = 'UPDATE_DESCRIPTION_FAILURE';
+
 export interface Profile {
   name: string;
   email: string;
   avatarUrl: string;
+  description: string;
 }
 
 export interface ProfileState {
   profile: Profile;
   isLoading: boolean;
   isNameLoading: boolean;
+  isDescriptionLoading: boolean;
 }
 
 interface LoadProfileStartAction {
@@ -74,6 +80,22 @@ interface UpdateNameFailureAction {
   isNameLoading: boolean;
 }
 
+interface UpdateDescriptionStartAction {
+  type: typeof UPDATE_DESCRIPTION_START;
+  isDescriptionLoading: boolean;
+}
+
+interface UpdateDescriptionSuccessAction {
+  type: typeof UPDATE_DESCRIPTION_SUCCESS;
+  description: string;
+  isDescriptionLoading: boolean;
+}
+
+interface UpdateDescriptionFailureAction {
+  type: typeof UPDATE_DESCRIPTION_FAILURE;
+  isDescriptionLoading: boolean;
+}
+
 export type ProfileActionTypes =
   | LoadProfileStartAction
   | LoadProfileSuccessAction
@@ -83,7 +105,10 @@ export type ProfileActionTypes =
   | UploadAvatarFailureAction
   | UpdateNameStartAction
   | UpdateNameSuccessAction
-  | UpdateNameFailureAction;
+  | UpdateNameFailureAction
+  | UpdateDescriptionStartAction
+  | UpdateDescriptionSuccessAction
+  | UpdateDescriptionFailureAction;
 
 export const actionCreators = {
   getProfile: () => {
@@ -137,10 +162,21 @@ export const actionCreators = {
     axios
       .post('/profile/name', {name: name})
       .then(() => {
-        dispatch({type: UPDATE_NAME_SUCCESS, name: name});
+        dispatch({type: UPDATE_NAME_SUCCESS, name: name, isNameLoading: false});
       })
       .catch(() => {
         dispatch({type: UPDATE_NAME_FAILURE, isNameLoading: false});
+      });
+  },
+  submitDescription: (description: string) => async (dispatch: ThunkDispatch<{}, {}, any>) => {
+    dispatch({type: UPDATE_DESCRIPTION_START, isDescriptionLoading: true});
+    axios
+      .post('/profile/description', {description: description})
+      .then(() => {
+        dispatch({type: UPDATE_DESCRIPTION_SUCCESS, description: description, isDescriptionLoading: false});
+      })
+      .catch(() => {
+        dispatch({type: UPDATE_DESCRIPTION_FAILURE, isDescriptionLoading: false});
       });
   },
 };
@@ -148,10 +184,12 @@ export const actionCreators = {
 const initialState: ProfileState = {
   isLoading: false,
   isNameLoading: false,
+  isDescriptionLoading: false,
   profile: {
     name: '',
     email: '',
     avatarUrl: '',
+    description: '',
   },
 };
 
@@ -175,6 +213,12 @@ export const reducer = (state = initialState, action: ProfileActionTypes): Profi
       return {...state, isNameLoading: action.isNameLoading, profile: {...state.profile, name: action.name}};
     case UPDATE_NAME_FAILURE:
       return {...state, isNameLoading: action.isNameLoading};
+    case UPDATE_DESCRIPTION_START:
+      return {...state, isDescriptionLoading: action.isDescriptionLoading};
+    case UPDATE_DESCRIPTION_SUCCESS:
+      return {...state, isDescriptionLoading: action.isDescriptionLoading, profile: {...state.profile, description: action.description}};
+    case UPDATE_DESCRIPTION_FAILURE:
+      return {...state, isDescriptionLoading: action.isDescriptionLoading};
     default:
       return state;
   }

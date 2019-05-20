@@ -35,7 +35,7 @@ const FriendList = (props: FriendListProps) => {
           </div>
           <div className="tile-content">
             <p className="tile-title">{user.name}</p>
-            <small className="tile-subtitle text-gray">{`Un chien plein d'énergie`}</small>
+            <small className="tile-subtitle text-gray">{user.description}</small>
           </div>
         </div>
       ))}
