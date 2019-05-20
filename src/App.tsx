@@ -7,6 +7,7 @@ import configureStore from './configureStore';
 import {ConnectedRouter} from 'connected-react-router';
 import {createHashHistory} from 'history';
 import 'spectre.css/dist/spectre.min.css';
+import 'spectre.css/dist/spectre-icons.min.css';
 import './style/main.scss';
 
 const history = createHashHistory();

@@ -6,9 +6,14 @@ import {AppState} from '.';
 const LOAD_PROFILE_START = 'LOAD_PROFILE_START';
 const LOAD_PROFILE_SUCCESS = 'LOAD_PROFILE_SUCCESS';
 const LOAD_PROFILE_FAILURE = 'LOAD_PROFILE_FAILURE';
+
 const UPLOAD_AVATAR_START = 'UPLOAD_AVATAR_START';
 const UPLOAD_AVATAR_SUCCESS = 'UPLOAD_AVATAR_SUCCESS';
 const UPLOAD_AVATAR_FAILURE = 'UPLOAD_AVATAR_FAILURE';
+
+const UPDATE_NAME_START = 'UPDATE_NAME_START';
+const UPDATE_NAME_SUCCESS = 'UPDATE_NAME_SUCCESS';
+const UPDATE_NAME_FAILURE = 'UPDATE_NAME_FAILURE';
 
 export interface Profile {
   name: string;
@@ -19,6 +24,7 @@ export interface Profile {
 export interface ProfileState {
   profile: Profile;
   isLoading: boolean;
+  isNameLoading: boolean;
 }
 
 interface LoadProfileStartAction {
@@ -53,13 +59,32 @@ interface UploadAvatarFailureAction {
   isLoading: boolean;
 }
 
+interface UpdateNameStartAction {
+  type: typeof UPDATE_NAME_START;
+  isNameLoading: boolean;
+}
+
+interface UpdateNameSuccessAction {
+  type: typeof UPDATE_NAME_SUCCESS;
+  name: string;
+  isNameLoading: boolean;
+}
+
+interface UpdateNameFailureAction {
+  type: typeof UPDATE_NAME_FAILURE;
+  isNameLoading: boolean;
+}
+
 export type ProfileActionTypes =
   | LoadProfileStartAction
   | LoadProfileSuccessAction
   | LoadProfileFailureAction
   | UploadAvatarStartAction
   | UploadAvatarSuccessAction
-  | UploadAvatarFailureAction;
+  | UploadAvatarFailureAction
+  | UpdateNameStartAction
+  | UpdateNameSuccessAction
+  | UpdateNameFailureAction;
 
 export const actionCreators = {
   getProfile: () => {
@@ -110,10 +135,22 @@ export const actionCreators = {
         console.log(error);
       });
   },
+  submitName: (name: string) => async (dispatch: ThunkDispatch<{}, {}, any>) => {
+    dispatch({type: UPDATE_NAME_START, isNameLoading: true});
+    axios
+      .post('/profile/name', {name: name})
+      .then(() => {
+        dispatch({type: UPDATE_NAME_SUCCESS, name: name});
+      })
+      .catch(() => {
+        dispatch({type: UPDATE_NAME_FAILURE, isNameLoading: false});
+      });
+  },
 };
 
 const initialState: ProfileState = {
   isLoading: false,
+  isNameLoading: false,
   profile: {
     name: '',
     email: '',
@@ -135,6 +172,12 @@ export const reducer = (state = initialState, action: ProfileActionTypes): Profi
       return {...state, isLoading: action.isLoading, profile: {...state.profile, avatarUrl: action.avatarUrl}};
     case UPLOAD_AVATAR_FAILURE:
       return {...state, isLoading: action.isLoading};
+    case UPDATE_NAME_START:
+      return {...state, isNameLoading: action.isNameLoading};
+    case UPDATE_NAME_SUCCESS:
+      return {...state, isNameLoading: action.isNameLoading, profile: {...state.profile, name: action.name}};
+    case UPDATE_NAME_FAILURE:
+      return {...state, isNameLoading: action.isNameLoading};
     default:
       return state;
   }
