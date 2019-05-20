@@ -119,9 +119,8 @@ export const actionCreators = {
 
           ToastsStore.success('Lieu ajouté')
         })
-        .catch((error: Error) => {
+        .catch(() => {
           dispatch({type: ADD_PLACE_FAILURE, isLoading: false});
-          ToastsStore.error('Echec d\'ajout: ' + error.message);
         });
     };
   },

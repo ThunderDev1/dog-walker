@@ -1,6 +1,5 @@
 import {ThunkDispatch} from 'redux-thunk';
 import axios from 'axios';
-import {ToastsStore} from 'react-toasts';
 
 const LOAD_FRIENDS_START = 'LOAD_FRIENDS_START';
 const LOAD_FRIENDS_SUCCESS = 'LOAD_FRIENDS_SUCCESS';
@@ -44,10 +43,8 @@ export const actionCreators = {
         .then((response: any) => {
           dispatch({type: LOAD_FRIENDS_SUCCESS, isLoading: false, friendList: response.data});
         })
-        .catch((error: Error) => {
+        .catch(() => {
           dispatch({type: LOAD_FRIENDS_FAILURE, isLoading: false});
-          ToastsStore.error(error.message);
-          console.log(error);
         });
     };
   },

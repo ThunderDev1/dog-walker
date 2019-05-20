@@ -1,6 +1,5 @@
 import {ThunkDispatch} from 'redux-thunk';
 import axios from 'axios';
-import {ToastsStore} from 'react-toasts';
 import {AppState} from '.';
 
 const LOAD_PROFILE_START = 'LOAD_PROFILE_START';
@@ -104,15 +103,13 @@ export const actionCreators = {
               .then((response: any) => {
                 dispatch({type: LOAD_PROFILE_SUCCESS, isLoading: false, profile: response.data});
               })
-              .catch((error: Error) => {
+              .catch(() => {
                 dispatch({type: LOAD_PROFILE_FAILURE, isLoading: false});
-                ToastsStore.error(error.message);
               });
           }
         })
-        .catch((error: Error) => {
+        .catch(() => {
           dispatch({type: LOAD_PROFILE_FAILURE, isLoading: false});
-          ToastsStore.error(error.message);
         });
     };
   },
