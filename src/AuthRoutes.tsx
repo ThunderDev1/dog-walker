@@ -6,6 +6,7 @@ import {User} from 'oidc-client';
 import UserProfile from './components/UserProfile';
 import Contact from './components/Contact';
 import {initAxios} from './utils/startupHelper';
+import FriendList from './components/FriendList';
 
 interface AuthRoutesProps {
   user: User;
@@ -20,6 +21,7 @@ const AuthRoutes = (props: AuthRoutesProps) => {
       <Switch>
         <Route exact path="/" component={MapContainer} />
         <Route path="/user" component={UserProfile} />
+        <Route path="/friends" component={FriendList} />
         <Route path="/contact" component={Contact} />
       </Switch>
 

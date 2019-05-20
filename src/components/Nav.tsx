@@ -13,10 +13,13 @@ const Nav = () => {
     <header className="navbar">
       <section className="navbar-section">
         <Link to="/" className="btn btn-link btn-lg">
-          Nova Walker
+          Nova
         </Link>
         <Link to="/user" className="btn btn-link">
-          User
+          Profil
+        </Link>
+        <Link to="/friends" className="btn btn-link">
+          Amis
         </Link>
         <button className="btn btn-default btn-sm" onClick={event => logout(event)}>
           Logout
