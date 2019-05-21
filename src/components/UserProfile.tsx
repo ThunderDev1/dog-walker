@@ -8,8 +8,7 @@ import {FileUpload} from './utilities/FileUpload';
 interface DispatchProps {
   getProfile: () => void;
   uploadAvatar: (fileBase64: string, fileType: string, fileName: string) => Promise<void>;
-  submitName: (name: string) => void;
-  submitDescription: (description: string) => void;
+  updateProfile: (name: string, description: string) => void;
 }
 
 type UserProfileProps = ProfileStore.ProfileState & DispatchProps;
@@ -22,6 +21,12 @@ const UserProfile = (props: UserProfileProps) => {
     props.getProfile();
   }, []);
 
+  const handleSave = () => {
+    const name = (nameRef.current && nameRef.current.value) || '';
+    const description = (descRef.current && descRef.current.value) || '';
+    props.updateProfile(name, description);
+  };
+
   const renderEmptyView = () => {
     return (
       <div className="empty">
@@ -31,9 +36,11 @@ const UserProfile = (props: UserProfileProps) => {
     );
   };
 
+  console.log(props.profile.avatarUrl);
+
   return (
     <div className="my-2">
-      <FileUpload submitFile={props.uploadAvatar} maxWidth={300} maxHeight={300} isUploading={props.isLoading}>
+      <FileUpload submitFile={props.uploadAvatar} maxWidth={300} maxHeight={300} isUploading={false}>
         {props.profile.avatarUrl ? (
           <img src={props.profile.avatarUrl} alt="user avatar" className="s-circle p-centered" style={{height: '200px'}} />
         ) : (
@@ -44,27 +51,22 @@ const UserProfile = (props: UserProfileProps) => {
         <fieldset>
           <div className="form-group">
             <label className="form-label">Nom de votre animal</label>
-            <div className="has-icon-right">
-              <input type="text" ref={nameRef} className="form-input" defaultValue={props.profile.name} placeholder="ex: Nova" />
-              {props.isNameLoading ? (
-                <i className="form-icon loading" />
-              ) : (
-                <i className="form-icon icon icon-check" onClick={() => nameRef.current && props.submitName(nameRef.current.value)} />
-              )}
-            </div>
+            <input type="text" ref={nameRef} className="form-input" defaultValue={props.profile.name} placeholder="ex: Nova" />
             <label className="form-label">Description</label>
-            <div className="has-icon-right">
-              <input type="text" ref={descRef} className="form-input" defaultValue={props.profile.description} placeholder="ex: Chien plein d'énergie" />
-              {props.isNameLoading ? (
-                <i className="form-icon loading" />
-              ) : (
-                <i className="form-icon icon icon-check" onClick={() => descRef.current && props.submitDescription(descRef.current.value)} />
-              )}
-            </div>
+            <input
+              className="form-input"
+              type="text"
+              ref={descRef}
+              defaultValue={props.profile.description}
+              placeholder="ex: Chien plein d'énergie"
+            />
             <label className="form-label">Email</label>
             <input className="form-input" type="text" defaultValue={props.profile.email} disabled />
           </div>
         </fieldset>
+        <button className={'btn btn-primary p-centered' + (props.isLoading ? ' loading' : '')} onClick={() => handleSave()}>
+          Sauvegarder
+        </button>
       </div>
     </div>
   );

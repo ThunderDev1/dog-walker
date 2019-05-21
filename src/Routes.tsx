@@ -48,7 +48,7 @@ const Routes = (props: RoutesProps) => {
   return (
     <React.Fragment>
       <Nav />
-      <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.BOTTOM_CENTER} />
+      <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} />
       <Switch>
         <Route path="*" render={() => <AuthRoutes user={props.user} />} />
       </Switch>

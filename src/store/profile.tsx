@@ -1,6 +1,7 @@
 import {ThunkDispatch} from 'redux-thunk';
 import axios from 'axios';
 import {AppState} from '.';
+import {ToastsStore} from 'react-toasts';
 
 const LOAD_PROFILE_START = 'LOAD_PROFILE_START';
 const LOAD_PROFILE_SUCCESS = 'LOAD_PROFILE_SUCCESS';
@@ -10,13 +11,9 @@ const UPLOAD_AVATAR_START = 'UPLOAD_AVATAR_START';
 const UPLOAD_AVATAR_SUCCESS = 'UPLOAD_AVATAR_SUCCESS';
 const UPLOAD_AVATAR_FAILURE = 'UPLOAD_AVATAR_FAILURE';
 
-const UPDATE_NAME_START = 'UPDATE_NAME_START';
-const UPDATE_NAME_SUCCESS = 'UPDATE_NAME_SUCCESS';
-const UPDATE_NAME_FAILURE = 'UPDATE_NAME_FAILURE';
-
-const UPDATE_DESCRIPTION_START = 'UPDATE_DESCRIPTION_START';
-const UPDATE_DESCRIPTION_SUCCESS = 'UPDATE_DESCRIPTION_SUCCESS';
-const UPDATE_DESCRIPTION_FAILURE = 'UPDATE_DESCRIPTION_FAILURE';
+const UPDATE_PROFILE_START = 'UPDATE_PROFILE_START';
+const UPDATE_PROFILE_SUCCESS = 'UPDATE_PROFILE_SUCCESS';
+const UPDATE_PROFILE_FAILURE = 'UPDATE_PROFILE_FAILURE';
 
 export interface Profile {
   name: string;
@@ -28,8 +25,6 @@ export interface Profile {
 export interface ProfileState {
   profile: Profile;
   isLoading: boolean;
-  isNameLoading: boolean;
-  isDescriptionLoading: boolean;
 }
 
 interface LoadProfileStartAction {
@@ -64,36 +59,20 @@ interface UploadAvatarFailureAction {
   isLoading: boolean;
 }
 
-interface UpdateNameStartAction {
-  type: typeof UPDATE_NAME_START;
-  isNameLoading: boolean;
+interface UpdateProfileStartAction {
+  type: typeof UPDATE_PROFILE_START;
+  isLoading: boolean;
 }
 
-interface UpdateNameSuccessAction {
-  type: typeof UPDATE_NAME_SUCCESS;
+interface UpdateProfileSuccessAction {
+  type: typeof UPDATE_PROFILE_SUCCESS;
   name: string;
-  isNameLoading: boolean;
+  isLoading: boolean;
 }
 
-interface UpdateNameFailureAction {
-  type: typeof UPDATE_NAME_FAILURE;
-  isNameLoading: boolean;
-}
-
-interface UpdateDescriptionStartAction {
-  type: typeof UPDATE_DESCRIPTION_START;
-  isDescriptionLoading: boolean;
-}
-
-interface UpdateDescriptionSuccessAction {
-  type: typeof UPDATE_DESCRIPTION_SUCCESS;
-  description: string;
-  isDescriptionLoading: boolean;
-}
-
-interface UpdateDescriptionFailureAction {
-  type: typeof UPDATE_DESCRIPTION_FAILURE;
-  isDescriptionLoading: boolean;
+interface UpdateProfileFailureAction {
+  type: typeof UPDATE_PROFILE_FAILURE;
+  isLoading: boolean;
 }
 
 export type ProfileActionTypes =
@@ -103,12 +82,9 @@ export type ProfileActionTypes =
   | UploadAvatarStartAction
   | UploadAvatarSuccessAction
   | UploadAvatarFailureAction
-  | UpdateNameStartAction
-  | UpdateNameSuccessAction
-  | UpdateNameFailureAction
-  | UpdateDescriptionStartAction
-  | UpdateDescriptionSuccessAction
-  | UpdateDescriptionFailureAction;
+  | UpdateProfileStartAction
+  | UpdateProfileSuccessAction
+  | UpdateProfileFailureAction;
 
 export const actionCreators = {
   getProfile: () => {
@@ -151,40 +127,29 @@ export const actionCreators = {
       .post('/profile/avatar', data)
       .then(function(response: any) {
         dispatch({type: UPLOAD_AVATAR_SUCCESS, avatarUrl: response.data.avatarUrl, isLoading: false});
+
       })
       .catch(function(error) {
         dispatch({type: UPLOAD_AVATAR_FAILURE, isLoading: false});
         console.log(error);
       });
   },
-  submitName: (name: string) => async (dispatch: ThunkDispatch<{}, {}, any>) => {
-    dispatch({type: UPDATE_NAME_START, isNameLoading: true});
+  updateProfile: (name: string, description: string) => async (dispatch: ThunkDispatch<{}, {}, any>) => {
+    dispatch({type: UPDATE_PROFILE_START, isLoading: true});
     axios
-      .post('/profile/name', {name: name})
+      .post('/profile/update', {name, description })
       .then(() => {
-        dispatch({type: UPDATE_NAME_SUCCESS, name: name, isNameLoading: false});
+        dispatch({type: UPDATE_PROFILE_SUCCESS, isLoading: false});
+        ToastsStore.success('Profil mis à jour ✔️')
       })
       .catch(() => {
-        dispatch({type: UPDATE_NAME_FAILURE, isNameLoading: false});
-      });
-  },
-  submitDescription: (description: string) => async (dispatch: ThunkDispatch<{}, {}, any>) => {
-    dispatch({type: UPDATE_DESCRIPTION_START, isDescriptionLoading: true});
-    axios
-      .post('/profile/description', {description: description})
-      .then(() => {
-        dispatch({type: UPDATE_DESCRIPTION_SUCCESS, description: description, isDescriptionLoading: false});
-      })
-      .catch(() => {
-        dispatch({type: UPDATE_DESCRIPTION_FAILURE, isDescriptionLoading: false});
+        dispatch({type: UPDATE_PROFILE_FAILURE, isLoading: false});
       });
   },
 };
 
 const initialState: ProfileState = {
   isLoading: false,
-  isNameLoading: false,
-  isDescriptionLoading: false,
   profile: {
     name: '',
     email: '',
@@ -207,18 +172,12 @@ export const reducer = (state = initialState, action: ProfileActionTypes): Profi
       return {...state, isLoading: action.isLoading, profile: {...state.profile, avatarUrl: action.avatarUrl}};
     case UPLOAD_AVATAR_FAILURE:
       return {...state, isLoading: action.isLoading};
-    case UPDATE_NAME_START:
-      return {...state, isNameLoading: action.isNameLoading};
-    case UPDATE_NAME_SUCCESS:
-      return {...state, isNameLoading: action.isNameLoading, profile: {...state.profile, name: action.name}};
-    case UPDATE_NAME_FAILURE:
-      return {...state, isNameLoading: action.isNameLoading};
-    case UPDATE_DESCRIPTION_START:
-      return {...state, isDescriptionLoading: action.isDescriptionLoading};
-    case UPDATE_DESCRIPTION_SUCCESS:
-      return {...state, isDescriptionLoading: action.isDescriptionLoading, profile: {...state.profile, description: action.description}};
-    case UPDATE_DESCRIPTION_FAILURE:
-      return {...state, isDescriptionLoading: action.isDescriptionLoading};
+    case UPDATE_PROFILE_START:
+      return {...state, isLoading: action.isLoading};
+    case UPDATE_PROFILE_SUCCESS:
+      return {...state, isLoading: action.isLoading};
+    case UPDATE_PROFILE_FAILURE:
+      return {...state, isLoading: action.isLoading};
     default:
       return state;
   }
