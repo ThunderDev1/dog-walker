@@ -7,6 +7,10 @@ const LOAD_PROFILE_START = 'LOAD_PROFILE_START';
 const LOAD_PROFILE_SUCCESS = 'LOAD_PROFILE_SUCCESS';
 const LOAD_PROFILE_FAILURE = 'LOAD_PROFILE_FAILURE';
 
+const LOAD_PUBLIC_PROFILE_START = 'LOAD_PUBLIC_PROFILE_START';
+const LOAD_PUBLIC_PROFILE_SUCCESS = 'LOAD_PUBLIC_PROFILE_SUCCESS';
+const LOAD_PUBLIC_PROFILE_FAILURE = 'LOAD_PUBLIC_PROFILE_FAILURE';
+
 const UPLOAD_AVATAR_START = 'UPLOAD_AVATAR_START';
 const UPLOAD_AVATAR_SUCCESS = 'UPLOAD_AVATAR_SUCCESS';
 const UPLOAD_AVATAR_FAILURE = 'UPLOAD_AVATAR_FAILURE';
@@ -40,6 +44,21 @@ interface LoadProfileSuccessAction {
 
 interface LoadProfileFailureAction {
   type: typeof LOAD_PROFILE_FAILURE;
+  isLoading: boolean;
+}
+interface LoadPublicProfileStartAction {
+  type: typeof LOAD_PUBLIC_PROFILE_START;
+  isLoading: boolean;
+}
+
+interface LoadPublicProfileSuccessAction {
+  type: typeof LOAD_PUBLIC_PROFILE_SUCCESS;
+  profile: Profile;
+  isLoading: boolean;
+}
+
+interface LoadPublicProfileFailureAction {
+  type: typeof LOAD_PUBLIC_PROFILE_FAILURE;
   isLoading: boolean;
 }
 
@@ -79,6 +98,9 @@ export type ProfileActionTypes =
   | LoadProfileStartAction
   | LoadProfileSuccessAction
   | LoadProfileFailureAction
+  | LoadPublicProfileStartAction
+  | LoadPublicProfileSuccessAction
+  | LoadPublicProfileFailureAction
   | UploadAvatarStartAction
   | UploadAvatarSuccessAction
   | UploadAvatarFailureAction
@@ -114,6 +136,20 @@ export const actionCreators = {
         });
     };
   },
+  getPublicProfile: (userId: string) => {
+    return async (dispatch: ThunkDispatch<{}, {}, any>) => {
+      dispatch({type: LOAD_PUBLIC_PROFILE_START, isLoading: true});
+      return axios
+        .get(`/profile/${userId}`)
+        .then((response: any) => {
+          const user = response.data;
+          dispatch({type: LOAD_PUBLIC_PROFILE_SUCCESS, isLoading: false, profile: user});
+        })
+        .catch(() => {
+          dispatch({type: LOAD_PUBLIC_PROFILE_FAILURE, isLoading: false});
+        });
+    };
+  },
   uploadAvatar: (fileBase64: string, fileType: string, fileName: string) => async (dispatch: ThunkDispatch<{}, {}, any>): Promise<void> => {
     dispatch({type: UPLOAD_AVATAR_START, isLoading: true});
 
@@ -127,7 +163,6 @@ export const actionCreators = {
       .post('/profile/avatar', data)
       .then(function(response: any) {
         dispatch({type: UPLOAD_AVATAR_SUCCESS, avatarUrl: response.data.avatarUrl, isLoading: false});
-
       })
       .catch(function(error) {
         dispatch({type: UPLOAD_AVATAR_FAILURE, isLoading: false});
@@ -137,10 +172,10 @@ export const actionCreators = {
   updateProfile: (name: string, description: string) => async (dispatch: ThunkDispatch<{}, {}, any>) => {
     dispatch({type: UPDATE_PROFILE_START, isLoading: true});
     axios
-      .post('/profile/update', {name, description })
+      .post('/profile/update', {name, description})
       .then(() => {
         dispatch({type: UPDATE_PROFILE_SUCCESS, isLoading: false});
-        ToastsStore.success('Profil mis à jour ✔️')
+        ToastsStore.success('Profil mis à jour ✔️');
       })
       .catch(() => {
         dispatch({type: UPDATE_PROFILE_FAILURE, isLoading: false});
@@ -165,6 +200,12 @@ export const reducer = (state = initialState, action: ProfileActionTypes): Profi
     case LOAD_PROFILE_SUCCESS:
       return {...state, isLoading: action.isLoading, profile: action.profile};
     case LOAD_PROFILE_FAILURE:
+      return {...state, isLoading: action.isLoading};
+    case LOAD_PUBLIC_PROFILE_START:
+      return {...state, isLoading: action.isLoading};
+    case LOAD_PUBLIC_PROFILE_SUCCESS:
+      return {...state, isLoading: action.isLoading, profile: action.profile};
+    case LOAD_PUBLIC_PROFILE_FAILURE:
       return {...state, isLoading: action.isLoading};
     case UPLOAD_AVATAR_START:
       return {...state, isLoading: action.isLoading};

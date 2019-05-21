@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import {AppState} from '../store';
 import * as FriendListStore from '../store/friendList';
 import {useEffect} from 'react';
+import {Link} from 'react-router-dom';
 
 interface DispatchProps {
   getFriends: () => void;
@@ -27,17 +28,19 @@ const FriendList = (props: FriendListProps) => {
     <div className="container my-2">
       {!props.isLoading && props.friendList.length == 0 && renderEmptyView()}
       {props.friendList.map(user => (
-        <div className="tile tile-centered my-2" key={user.id}>
-          <div className="tile-icon">
-            <figure className="avatar avatar-lg" data-initial="?">
-              {user.avatarUrl && <img src={user.avatarUrl} alt="Avatar" />}
-            </figure>
+        <Link to={`/user/${user.id}`} key={user.id}>
+          <div className="tile tile-centered my-2">
+            <div className="tile-icon">
+              <figure className="avatar avatar-lg" data-initial="?">
+                {user.avatarUrl && <img src={user.avatarUrl} alt="Avatar" />}
+              </figure>
+            </div>
+            <div className="tile-content">
+              <p className="tile-title">{user.name}</p>
+              <small className="tile-subtitle text-gray">{user.description}</small>
+            </div>
           </div>
-          <div className="tile-content">
-            <p className="tile-title">{user.name}</p>
-            <small className="tile-subtitle text-gray">{user.description}</small>
-          </div>
-        </div>
+        </Link>
       ))}
     </div>
   );

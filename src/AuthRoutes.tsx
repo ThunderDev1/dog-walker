@@ -7,6 +7,7 @@ import UserProfile from './components/UserProfile';
 import Contact from './components/Contact';
 import {initAxios} from './utils/startupHelper';
 import FriendList from './components/FriendList';
+import PublicProfile from './components/PublicProfile';
 
 interface AuthRoutesProps {
   user: User;
@@ -14,17 +15,15 @@ interface AuthRoutesProps {
 
 const AuthRoutes = (props: AuthRoutesProps) => {
   initAxios(props.user.access_token);
-  console.log('render')
-
   return (
     <React.Fragment>
       <Switch>
         <Route exact path="/" component={MapContainer} />
-        <Route path="/user" component={UserProfile} />
+        <Route exact path="/user" component={UserProfile} />
+        <Route path="/user/:userId" component={PublicProfile} />
         <Route path="/friends" component={FriendList} />
         <Route path="/contact" component={Contact} />
       </Switch>
-
     </React.Fragment>
   );
 };
