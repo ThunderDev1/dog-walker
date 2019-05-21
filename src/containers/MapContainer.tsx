@@ -3,7 +3,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import {connect} from 'react-redux';
 import {AppState} from '../store';
 import * as MapStore from '../store/map';
-import Map from '../components/Map';
+import Map from '../components/Map/Map';
 import {useEffect} from 'react';
 
 interface DispatchProps {

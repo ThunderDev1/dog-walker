@@ -2,10 +2,10 @@ import * as React from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import * as mapboxgl from 'mapbox-gl';
 import {MapboxOptions, MapboxGeoJSONFeature} from 'mapbox-gl';
-import * as MapStore from '../store/map';
+import * as MapStore from '../../store/map';
 import AddPlace from './AddPlace';
 import PlaceDetailsModal from './PlaceDetailsModal';
-import {PlaceDetails} from '../store/map';
+import {PlaceDetails} from '../../store/map';
 
 declare const MAPBOX_TOKEN: string;
 declare const MAPBOX_STYLE: string;

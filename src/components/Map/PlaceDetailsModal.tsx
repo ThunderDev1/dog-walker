@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {PlaceDetails} from '../store/map';
-import placeTypes from '../constants/placeTypes';
+import {PlaceDetails} from '../../store/map';
+import placeTypes from '../../constants/placeTypes';
 
 interface DispatchProps {
   close: () => void;
