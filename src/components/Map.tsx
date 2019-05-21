@@ -1,9 +1,11 @@
 import * as React from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import * as mapboxgl from 'mapbox-gl';
-import {MapboxOptions} from 'mapbox-gl';
+import {MapboxOptions, MapboxGeoJSONFeature} from 'mapbox-gl';
 import * as MapStore from '../store/map';
 import AddPlace from './AddPlace';
+import PlaceDetailsModal from './PlaceDetailsModal';
+import {PlaceDetails} from '../store/map';
 
 declare const MAPBOX_TOKEN: string;
 declare const MAPBOX_STYLE: string;
@@ -21,12 +23,15 @@ interface DispatchProps {
   setPlaceCoordinates: (position: mapboxgl.LngLat) => void;
   addPlace: (placeTypeId: number, placeName: string) => void;
   getPlaces: () => Promise<void>;
+  deletePlace: (placeId: number) => void;
 }
 
 type MapProps = MapStore.MapState & DispatchProps;
 
 interface MapState {
   showAddModal: boolean;
+  showDetailsModal: boolean;
+  placeDetails: PlaceDetails;
 }
 
 export default class Map extends React.Component<MapProps, MapState> {
@@ -37,7 +42,33 @@ export default class Map extends React.Component<MapProps, MapState> {
     super(props);
     this.state = {
       showAddModal: false,
+      showDetailsModal: false,
+      placeDetails: {
+        id: 0,
+        name: '',
+        placeTypeId: 1
+      }
     };
+  }
+
+  private showPlaceDetails(feature: MapboxGeoJSONFeature) {
+    this.cancelAddPlace();
+    if (feature.properties) {
+      var details: PlaceDetails = {
+        id: feature.properties['id'],
+        name: feature.properties['name'],
+        placeTypeId: feature.properties['placeTypeId'],
+      };
+
+      // center on marquer
+      const placeCoordinates = (feature.geometry as any).coordinates;
+      this.map.easeTo({
+        center: [placeCoordinates[0], placeCoordinates[1] - 0.0025],
+        zoom: 14,
+      });
+
+      this.setState({showDetailsModal: true, placeDetails: details});
+    }
   }
 
   public componentDidMount() {
@@ -84,11 +115,18 @@ export default class Map extends React.Component<MapProps, MapState> {
         },
         paint: {},
       });
-      this.map.on('click', e => {
+      this.map.on('contextmenu', e => {
         this.addPlaceMarker.remove();
         this.addPlaceMarker = new mapboxgl.Marker().setLngLat(e.lngLat).addTo(this.map);
         this.setState({showAddModal: true});
+        this.closeDetails();
         this.props.setPlaceCoordinates(e.lngLat);
+      });
+      this.map.on('click', 'parks', e => {
+        e.features && this.showPlaceDetails(e.features[0]);
+      });
+      this.map.on('click', 'waste-bags', e => {
+        e.features && this.showPlaceDetails(e.features[0]);
       });
     });
   }
@@ -106,14 +144,19 @@ export default class Map extends React.Component<MapProps, MapState> {
     this.addPlaceMarker.remove();
   };
 
+  public closeDetails = () => {
+    this.setState({showDetailsModal: false});
+  }
+
   public render() {
-    const {showAddModal} = this.state;
-    const {addPlace} = this.props;
+    const {showAddModal, showDetailsModal, placeDetails} = this.state;
+    const {addPlace, deletePlace} = this.props;
 
     return (
       <React.Fragment>
         <div id="map" style={{width: '100vw', height: '95vh'}} className="map-container" />
         {showAddModal && <AddPlace close={this.cancelAddPlace} addPlace={addPlace} />}
+        {showDetailsModal && <PlaceDetailsModal {...placeDetails} close={this.closeDetails} delete={deletePlace} />}
       </React.Fragment>
     );
   }

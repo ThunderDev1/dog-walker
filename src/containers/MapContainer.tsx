@@ -10,6 +10,7 @@ interface DispatchProps {
   setPlaceCoordinates: (position: mapboxgl.LngLat) => void;
   addPlace: (placeTypeId: number, placeName: string) => void;
   getPlaces: () => Promise<void>;
+  deletePlace: (placeId: number) => void;
 }
 
 type MapContainerProps = MapStore.MapState & DispatchProps;

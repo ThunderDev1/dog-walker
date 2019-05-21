@@ -13,9 +13,19 @@ const ADD_PLACE_START = 'ADD_PLACE_START';
 const ADD_PLACE_SUCCESS = 'ADD_PLACE_SUCCESS';
 const ADD_PLACE_FAILURE = 'ADD_PLACE_FAILURE';
 
+const DELETE_PLACE_START = 'DELETE_PLACE_START';
+const DELETE_PLACE_SUCCESS = 'DELETE_PLACE_SUCCESS';
+const DELETE_PLACE_FAILURE = 'DELETE_PLACE_FAILURE';
+
 const LOAD_PLACES_START = 'LOAD_PLACES_START';
 const LOAD_PLACES_SUCCESS = 'LOAD_PLACES_SUCCESS';
 const LOAD_PLACES_FAILURE = 'LOAD_PLACES_FAILURE';
+
+export interface PlaceDetails {
+  id: number;
+  name: string;
+  placeTypeId: number;
+}
 
 export interface MapState {
   lastPosition: mapboxgl.LngLat;
@@ -67,6 +77,21 @@ interface AddPlaceFailureAction {
   isLoading: boolean;
 }
 
+interface DeletePlaceStartAction {
+  type: typeof DELETE_PLACE_START;
+  isLoading: boolean;
+}
+
+interface DeletePlaceSuccessAction {
+  type: typeof DELETE_PLACE_SUCCESS;
+  isLoading: boolean;
+}
+
+interface DeletePlaceFailureAction {
+  type: typeof DELETE_PLACE_FAILURE;
+  isLoading: boolean;
+}
+
 export type MapActionTypes =
   | UpdateLastPositionAction
   | SetCoordinatesAction
@@ -75,7 +100,10 @@ export type MapActionTypes =
   | AddPlaceFailureAction
   | LoadPlacesStartAction
   | LoadPlacesSuccessAction
-  | LoadPlacesFailureAction;
+  | LoadPlacesFailureAction
+  | DeletePlaceStartAction
+  | DeletePlaceSuccessAction
+  | DeletePlaceFailureAction;
 
 export const actionCreators = {
   addPlace: (placeTypeId: number, placeName: string) => {
@@ -107,6 +135,7 @@ export const actionCreators = {
             properties: {
               id: createdId,
               placeTypeId: place.placeTypeId,
+              name: place.placeName,
             },
           };
 
@@ -118,7 +147,7 @@ export const actionCreators = {
 
           dispatch({type: LOAD_PLACES_SUCCESS, isLoading: false, geoData: geoData});
 
-          ToastsStore.success('Lieu ajouté')
+          ToastsStore.success('Lieu ajouté');
         })
         .catch(() => {
           dispatch({type: ADD_PLACE_FAILURE, isLoading: false});
@@ -137,6 +166,30 @@ export const actionCreators = {
         .catch((error: Error) => {
           dispatch({type: LOAD_PLACES_FAILURE, isLoading: false});
           console.log(error);
+        });
+    };
+  },
+
+  deletePlace: (placeId: number) => {
+    return async (dispatch: ThunkDispatch<{}, {}, any>, getState: () => AppState) => {
+      dispatch({type: DELETE_PLACE_START, isLoading: true});
+      return axios
+        .delete(`/place/${placeId}`)
+        .then(() => {
+          const {map} = getState();
+          const updatedFeatures = map.geoData.features.filter(feature => feature.properties && feature.properties.id != placeId);
+          const geoData = {
+            type: map.geoData.type,
+            features: updatedFeatures,
+          };
+
+          dispatch({type: LOAD_PLACES_SUCCESS, isLoading: false, geoData: geoData});
+
+          dispatch({type: DELETE_PLACE_SUCCESS, isLoading: false});
+          ToastsStore.success('Lieu supprimé');
+        })
+        .catch(() => {
+          dispatch({type: DELETE_PLACE_FAILURE, isLoading: false});
         });
     };
   },
@@ -179,6 +232,12 @@ export const reducer = (state = initialState, action: MapActionTypes): MapState 
     case LOAD_PLACES_SUCCESS:
       return {...state, isLoading: action.isLoading, geoData: action.geoData};
     case LOAD_PLACES_FAILURE:
+      return {...state, isLoading: action.isLoading};
+    case DELETE_PLACE_START:
+      return {...state, isLoading: action.isLoading};
+    case DELETE_PLACE_SUCCESS:
+      return {...state, isLoading: action.isLoading};
+    case DELETE_PLACE_FAILURE:
       return {...state, isLoading: action.isLoading};
     default:
       return state;
