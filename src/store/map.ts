@@ -78,7 +78,7 @@ export type MapActionTypes =
   | LoadPlacesFailureAction;
 
 export const actionCreators = {
-  addPlace: (placeTypeId: number) => {
+  addPlace: (placeTypeId: number, placeName: string) => {
     return async (dispatch: ThunkDispatch<{}, {}, any>, getState: () => AppState) => {
       dispatch({type: ADD_PLACE_START, isLoading: true});
 
@@ -88,6 +88,7 @@ export const actionCreators = {
         latitude: state.map.placeCoordinates.lat,
         longitude: state.map.placeCoordinates.lng,
         placeTypeId,
+        placeName,
       };
       return axios
         .post('/place', place)

@@ -19,7 +19,7 @@ const defaultMapProps: Partial<MapboxOptions> = {
 
 interface DispatchProps {
   setPlaceCoordinates: (position: mapboxgl.LngLat) => void;
-  addPlace: (placeTypeId: number) => void;
+  addPlace: (placeTypeId: number, placeName: string) => void;
   getPlaces: () => Promise<void>;
 }
 
