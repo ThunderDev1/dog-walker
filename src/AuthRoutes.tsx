@@ -8,6 +8,7 @@ import Contact from './components/Contact';
 import {initAxios} from './utils/startupHelper';
 import FriendList from './components/FriendList';
 import PublicProfile from './components/PublicProfile';
+import MeetingList from './components/meetings/MeetingList';
 
 interface AuthRoutesProps {
   user: User;
@@ -23,6 +24,7 @@ const AuthRoutes = (props: AuthRoutesProps) => {
         <Route path="/user/:userId" component={PublicProfile} />
         <Route path="/friends" component={FriendList} />
         <Route path="/contact" component={Contact} />
+        <Route path="/meetings" component={MeetingList} />
       </Switch>
     </React.Fragment>
   );

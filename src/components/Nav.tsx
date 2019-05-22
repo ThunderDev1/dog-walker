@@ -21,6 +21,9 @@ const Nav = () => {
         <Link to="/friends" className="btn btn-link">
           Amis
         </Link>
+        <Link to="/meetings" className="btn btn-link">
+          Balades
+        </Link>
       </section>
       <section className="navbar-center">
         <button className="btn btn-primary btn-sm mx-2" onClick={event => logout(event)}>

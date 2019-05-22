@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {AppState} from '../store';
 import * as MapStore from '../store/map';
 import * as MeetingsStore from '../store/meetings/createMeeting';
-import Map from '../components/Map/Map';
+import Map from '../components/map/Map';
 import {useEffect} from 'react';
 
 interface DispatchProps {
