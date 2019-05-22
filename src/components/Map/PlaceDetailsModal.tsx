@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {PlaceDetails} from '../../store/map';
+import {PlaceDetails} from '../../store/meetings/createMeeting';
 import placeTypes from '../../constants/placeTypes';
 
 interface DispatchProps {
@@ -16,7 +16,7 @@ const PlaceDetailsModal = (props: PlaceDetailsModal) => {
   };
 
   return (
-    <div className="card add-place m-2">
+    <div className="card fixed-bottom m-2">
       <div className="card-header">
         <div className="card-title h5">{placeTypes[props.placeTypeId]}</div>
       </div>

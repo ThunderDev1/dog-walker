@@ -3,9 +3,11 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import * as mapboxgl from 'mapbox-gl';
 import {MapboxOptions, MapboxGeoJSONFeature} from 'mapbox-gl';
 import * as MapStore from '../../store/map';
+import * as MeetingsStore from '../../store/meetings/createMeeting';
 import AddPlace from './AddPlace';
 import PlaceDetailsModal from './PlaceDetailsModal';
-import {PlaceDetails} from '../../store/map';
+import {PlaceDetails} from '../../store/meetings/createMeeting';
+import CreateMeeting from './CreateMeeting';
 
 declare const MAPBOX_TOKEN: string;
 declare const MAPBOX_STYLE: string;
@@ -24,13 +26,16 @@ interface DispatchProps {
   addPlace: (placeTypeId: number, placeName: string) => void;
   getPlaces: () => Promise<void>;
   deletePlace: (placeId: number) => void;
+  getPlacesByDistance: () => Promise<void>;
+  createMeeting: (placeId: number) => void;
 }
 
-type MapProps = MapStore.MapState & DispatchProps;
+type MapProps = MapStore.MapState & MeetingsStore.CreateMeetingState & DispatchProps;
 
 interface MapState {
   showAddModal: boolean;
   showDetailsModal: boolean;
+  showMeetingModal: boolean;
   placeDetails: PlaceDetails;
 }
 
@@ -43,29 +48,35 @@ export default class Map extends React.Component<MapProps, MapState> {
     this.state = {
       showAddModal: false,
       showDetailsModal: false,
+      showMeetingModal: false,
       placeDetails: {
         id: 0,
         name: '',
-        placeTypeId: 1
-      }
+        placeTypeId: 1,
+        latitude: 0,
+        longitude: 0,
+        distance: 0,
+      },
     };
   }
 
   private showPlaceDetails(feature: MapboxGeoJSONFeature) {
     this.cancelAddPlace();
     if (feature.properties) {
-      var details: PlaceDetails = {
-        id: feature.properties['id'],
-        name: feature.properties['name'],
-        placeTypeId: feature.properties['placeTypeId'],
-      };
-
       // center on marquer
       const placeCoordinates = (feature.geometry as any).coordinates;
       this.map.easeTo({
         center: [placeCoordinates[0], placeCoordinates[1] - 0.0005],
         zoom: 16,
       });
+      var details: PlaceDetails = {
+        id: feature.properties['id'],
+        name: feature.properties['name'],
+        placeTypeId: feature.properties['placeTypeId'],
+        latitude: placeCoordinates[1],
+        longitude: placeCoordinates[0],
+        distance: 0,
+      };
 
       this.setState({showDetailsModal: true, placeDetails: details});
     }
@@ -90,6 +101,7 @@ export default class Map extends React.Component<MapProps, MapState> {
     this.map.addControl(geolocateControl);
 
     this.map.on('load', () => {
+      // geolocateControl.trigger();
       this.map.addSource('places', {
         type: 'geojson',
         data: this.props.geoData,
@@ -146,17 +158,26 @@ export default class Map extends React.Component<MapProps, MapState> {
 
   public closeDetails = () => {
     this.setState({showDetailsModal: false});
-  }
+  };
+  public closeMeeting = () => {
+    this.setState({showMeetingModal: false});
+  };
 
   public render() {
-    const {showAddModal, showDetailsModal, placeDetails} = this.state;
-    const {addPlace, deletePlace} = this.props;
+    const {showAddModal, showDetailsModal, placeDetails, showMeetingModal} = this.state;
+    const {addPlace, deletePlace, getPlacesByDistance, meetingPlaces, createMeeting} = this.props;
 
     return (
       <React.Fragment>
         <div id="map" style={{width: '100vw', height: '95vh'}} className="map-container" />
         {showAddModal && <AddPlace close={this.cancelAddPlace} addPlace={addPlace} />}
         {showDetailsModal && <PlaceDetailsModal {...placeDetails} close={this.closeDetails} delete={deletePlace} />}
+        {showMeetingModal && <CreateMeeting loadPlaces={getPlacesByDistance} close={this.closeMeeting} places={meetingPlaces} createMeeting={createMeeting} />}
+        {!showMeetingModal && (
+          <button className="btn btn-lg btn-primary fixed-bottom p-centered my-2" onClick={() => this.setState({showMeetingModal: true})}>
+            Démarrer une balade
+          </button>
+        )}
       </React.Fragment>
     );
   }

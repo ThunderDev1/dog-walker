@@ -3,6 +3,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import {connect} from 'react-redux';
 import {AppState} from '../store';
 import * as MapStore from '../store/map';
+import * as MeetingsStore from '../store/meetings/createMeeting';
 import Map from '../components/Map/Map';
 import {useEffect} from 'react';
 
@@ -11,9 +12,11 @@ interface DispatchProps {
   addPlace: (placeTypeId: number, placeName: string) => void;
   getPlaces: () => Promise<void>;
   deletePlace: (placeId: number) => void;
+  getPlacesByDistance: () => Promise<void>;
+  createMeeting: (placeId: number) => void;
 }
 
-type MapContainerProps = MapStore.MapState & DispatchProps;
+type MapContainerProps = MapStore.MapState & MeetingsStore.CreateMeetingState & DispatchProps;
 
 const MapContainer = (props: MapContainerProps) => {
   useEffect(() => {
@@ -24,6 +27,6 @@ const MapContainer = (props: MapContainerProps) => {
 };
 
 export default connect(
-  (state: AppState) => ({...state.map}),
-  MapStore.actionCreators
+  (state: AppState) => ({...state.map, ...state.meetings.createMeeting}),
+  {...MapStore.actionCreators, ...MeetingsStore.actionCreators}
 )(MapContainer);

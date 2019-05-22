@@ -7,6 +7,7 @@ import {reducer as oidcReducer} from 'redux-oidc';
 import * as Map from './map';
 import * as Profile from './profile';
 import * as FriendList from './friendList';
+import * as Meetings from './meetings';
 
 interface OidcState {
   isLoadingUser: boolean;
@@ -19,6 +20,7 @@ export interface AppState {
   map: Map.MapState;
   profile: Profile.ProfileState;
   friendList: FriendList.FriendListState;
+  meetings: Meetings.MeetingState;
 }
 
 const rootReducer = (history: History) =>
@@ -28,6 +30,7 @@ const rootReducer = (history: History) =>
     map: Map.reducer,
     profile: Profile.reducer,
     friendList: FriendList.reducer,
+    meetings: Meetings.reducer,
   });
 
 export default rootReducer;

@@ -21,12 +21,6 @@ const LOAD_PLACES_START = 'LOAD_PLACES_START';
 const LOAD_PLACES_SUCCESS = 'LOAD_PLACES_SUCCESS';
 const LOAD_PLACES_FAILURE = 'LOAD_PLACES_FAILURE';
 
-export interface PlaceDetails {
-  id: number;
-  name: string;
-  placeTypeId: number;
-}
-
 export interface MapState {
   lastPosition: mapboxgl.LngLat;
   lastZoom: number;
@@ -163,9 +157,8 @@ export const actionCreators = {
         .then((response: any) => {
           dispatch({type: LOAD_PLACES_SUCCESS, isLoading: false, geoData: response.data});
         })
-        .catch((error: Error) => {
+        .catch(() => {
           dispatch({type: LOAD_PLACES_FAILURE, isLoading: false});
-          console.log(error);
         });
     };
   },
@@ -182,9 +175,7 @@ export const actionCreators = {
             type: map.geoData.type,
             features: updatedFeatures,
           };
-
           dispatch({type: LOAD_PLACES_SUCCESS, isLoading: false, geoData: geoData});
-
           dispatch({type: DELETE_PLACE_SUCCESS, isLoading: false});
           ToastsStore.success('Lieu supprimé');
         })

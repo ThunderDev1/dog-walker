@@ -20,7 +20,7 @@ const AddPlace = (props: AddPlaceProps) => {
   };
 
   return (
-    <div className="card add-place m-2">
+    <div className="card fixed-bottom m-2">
       <div className="card-header">
         <div className="card-title h5">Ajouter ce lieu</div>
       </div>
