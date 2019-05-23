@@ -18,6 +18,7 @@
     "connected-react-router": "6.4.0",
     "history": "4.9.0",
     "mapbox-gl": "0.54.0",
+    "moment": "2.24.0",
     "oidc-client": "1.7.1",
     "react": "16.8.6",
     "react-dom": "16.8.6",
