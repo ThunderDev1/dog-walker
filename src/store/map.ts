@@ -21,12 +21,33 @@ const LOAD_PLACES_START = 'LOAD_PLACES_START';
 const LOAD_PLACES_SUCCESS = 'LOAD_PLACES_SUCCESS';
 const LOAD_PLACES_FAILURE = 'LOAD_PLACES_FAILURE';
 
+const CHECK_MEETINGS_START = 'CHECK_MEETINGS_START';
+const CHECK_MEETINGS_SUCCESS = 'CHECK_MEETINGS_SUCCESS';
+const CHECK_MEETINGS_FAILURE = 'CHECK_MEETINGS_FAILURE';
+
 export interface MapState {
   lastPosition: mapboxgl.LngLat;
   lastZoom: number;
   placeCoordinates: mapboxgl.LngLat;
   isLoading: boolean;
   geoData: GeoJSON.FeatureCollection<GeoJSON.GeometryObject>;
+  onGoingMeetingId: number;
+}
+
+interface CheckMeetingsStartAction {
+  type: typeof CHECK_MEETINGS_START;
+  isLoading: boolean;
+}
+
+interface CheckMeetingsSuccessAction {
+  type: typeof CHECK_MEETINGS_SUCCESS;
+  onGoingMeetingId: number;
+  isLoading: boolean;
+}
+
+interface CheckMeetingsFailureAction {
+  type: typeof CHECK_MEETINGS_FAILURE;
+  isLoading: boolean;
 }
 
 interface LoadPlacesStartAction {
@@ -97,7 +118,10 @@ export type MapActionTypes =
   | LoadPlacesFailureAction
   | DeletePlaceStartAction
   | DeletePlaceSuccessAction
-  | DeletePlaceFailureAction;
+  | DeletePlaceFailureAction
+  | CheckMeetingsStartAction
+  | CheckMeetingsSuccessAction
+  | CheckMeetingsFailureAction;
 
 export const actionCreators = {
   addPlace: (placeTypeId: number, placeName: string) => {
@@ -185,6 +209,20 @@ export const actionCreators = {
     };
   },
 
+  getOnGoingMeeting: () => {
+    return async (dispatch: ThunkDispatch<{}, {}, any>) => {
+      dispatch({type: CHECK_MEETINGS_START, isLoading: true});
+      return axios
+        .get('/meeting/ongoing')
+        .then((response: any) => {
+          dispatch({type: CHECK_MEETINGS_SUCCESS, isLoading: false, onGoingMeetingId: response.data});
+        })
+        .catch(() => {
+          dispatch({type: CHECK_MEETINGS_FAILURE, isLoading: false});
+        });
+    };
+  },
+
   setPlaceCoordinates: (position: mapboxgl.LngLat) => (dispatch: Dispatch) => {
     dispatch({type: SET_COORDINATES, placeCoordinates: position});
   },
@@ -204,6 +242,7 @@ const initialState: MapState = {
     type: 'FeatureCollection',
     features: [],
   },
+  onGoingMeetingId: 0,
 };
 
 export const reducer = (state = initialState, action: MapActionTypes): MapState => {
@@ -229,6 +268,12 @@ export const reducer = (state = initialState, action: MapActionTypes): MapState 
     case DELETE_PLACE_SUCCESS:
       return {...state, isLoading: action.isLoading};
     case DELETE_PLACE_FAILURE:
+      return {...state, isLoading: action.isLoading};
+    case CHECK_MEETINGS_START:
+      return {...state, isLoading: action.isLoading};
+    case CHECK_MEETINGS_SUCCESS:
+      return {...state, isLoading: action.isLoading, onGoingMeetingId: action.onGoingMeetingId};
+    case CHECK_MEETINGS_FAILURE:
       return {...state, isLoading: action.isLoading};
     default:
       return state;
