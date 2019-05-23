@@ -4,7 +4,7 @@ import {AppState} from '../../store';
 import * as MeetingListStore from '../../store/meetings/meetingList';
 import {useEffect} from 'react';
 import {Link} from 'react-router-dom';
-import * as moment from 'moment';
+import StatusLabel from './StatusLabel';
 
 interface DispatchProps {
   getMeetings: () => void;
@@ -25,16 +25,6 @@ const MeetingList = (props: MeetingListProps) => {
     );
   };
 
-  const renderStatus = (endDate: string) => {
-    const now = moment();
-    const isPastEvent = moment(endDate, moment.ISO_8601).diff(now) < 0;
-    if (isPastEvent) {
-      return <span className="label label-warning">Terminé</span>;
-    } else {
-      return <span className="label label-success">En cours</span>;
-    }
-  };
-
   return (
     <div className="container my-2">
       {!props.isLoading && props.meetingList.length == 0 && renderEmptyView()}
@@ -51,7 +41,7 @@ const MeetingList = (props: MeetingListProps) => {
               <small className="tile-subtitle text-gray">{meeting.placeName}</small>
             </div>
             <div className="tile-action">
-              {renderStatus(meeting.endDate)}
+              <StatusLabel date={meeting.endDate} />
             </div>
           </div>
         </Link>

@@ -86,7 +86,7 @@ export const actionCreators = {
         const {latitude, longitude} = position.coords;
         console.log(position.coords);
         return axios
-          .post('/place/distance', {latitude, longitude})
+          .post('/place/meeting', {latitude, longitude})
           .then((response: any) => {
             dispatch({type: LOAD_PLACES_BY_DIST_SUCCESS, isLoading: false, meetingPlaces: response.data});
           })

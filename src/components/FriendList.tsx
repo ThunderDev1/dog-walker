@@ -4,6 +4,7 @@ import {AppState} from '../store';
 import * as FriendListStore from '../store/friendList';
 import {useEffect} from 'react';
 import {Link} from 'react-router-dom';
+import UserItem from './UserItem';
 
 interface DispatchProps {
   getFriends: () => void;
@@ -29,17 +30,7 @@ const FriendList = (props: FriendListProps) => {
       {!props.isLoading && props.friendList.length == 0 && renderEmptyView()}
       {props.friendList.map(user => (
         <Link to={`/user/${user.id}`} key={user.id}>
-          <div className="tile tile-centered my-2">
-            <div className="tile-icon">
-              <figure className="avatar avatar-lg" data-initial="?">
-                {user.avatarUrl && <img src={user.avatarUrl} alt="Avatar" />}
-              </figure>
-            </div>
-            <div className="tile-content">
-              <p className="tile-title">{user.name}</p>
-              <small className="tile-subtitle text-gray">{user.description}</small>
-            </div>
-          </div>
+          <UserItem user={user} />
         </Link>
       ))}
     </div>

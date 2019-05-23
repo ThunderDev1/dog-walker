@@ -5,7 +5,7 @@ const LOAD_FRIENDS_START = 'LOAD_FRIENDS_START';
 const LOAD_FRIENDS_SUCCESS = 'LOAD_FRIENDS_SUCCESS';
 const LOAD_FRIENDS_FAILURE = 'LOAD_FRIENDS_FAILURE';
 
-export interface Friend {
+export interface User {
   id: string;
   name: string;
   avatarUrl: string;
@@ -13,7 +13,7 @@ export interface Friend {
 }
 
 export interface FriendListState {
-  friendList: Friend[];
+  friendList: User[];
   isLoading: boolean;
 }
 
@@ -24,7 +24,7 @@ interface LoadFriendsStartAction {
 
 interface LoadFriendsSuccessAction {
   type: typeof LOAD_FRIENDS_SUCCESS;
-  friendList: Friend[];
+  friendList: User[];
   isLoading: boolean;
 }
 

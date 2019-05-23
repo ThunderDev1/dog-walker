@@ -9,12 +9,18 @@ import {initAxios} from './utils/startupHelper';
 import FriendList from './components/FriendList';
 import PublicProfile from './components/PublicProfile';
 import MeetingList from './components/meetings/MeetingList';
+import MeetingDetails from './components/meetings/MeetingDetails';
+import {useEffect} from 'react';
+import * as moment from 'moment';
 
 interface AuthRoutesProps {
   user: User;
 }
 
 const AuthRoutes = (props: AuthRoutesProps) => {
+  useEffect(() => {
+    moment.locale('fr');
+  }, []);
   initAxios(props.user.access_token);
   return (
     <React.Fragment>
@@ -25,6 +31,7 @@ const AuthRoutes = (props: AuthRoutesProps) => {
         <Route path="/friends" component={FriendList} />
         <Route path="/contact" component={Contact} />
         <Route path="/meetings" component={MeetingList} />
+        <Route path="/meeting/:meetingId" component={MeetingDetails} />
       </Switch>
     </React.Fragment>
   );
