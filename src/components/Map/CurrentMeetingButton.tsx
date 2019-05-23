@@ -10,7 +10,7 @@ const CurrentMeetingButton = (props: Props) => {
   const {meetingId} = props;
   return (
     <Link to={`/meeting/${meetingId}`}>
-      <div className="card fixed-bottom m-2" style={{bottom: '50px'}}>
+      <div className="card fixed-bottom m-2" style={{bottom: '70px'}}>
         <div className="columns p-2">
           <div className="column col-7 text-center my-1">
             <span className="h5">Balade en cours</span>

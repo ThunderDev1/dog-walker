@@ -10,23 +10,23 @@ const Nav = () => {
   };
 
   return (
-    <header className="navbar">
+    <header className="navbar py-1">
       <section className="navbar-section">
         <Link to="/" className="btn btn-link btn-lg">
-          Nova
+          Carte
         </Link>
-        <Link to="/user" className="btn btn-link">
+        <Link to="/user" className="btn btn-link btn-lg">
           Profil
         </Link>
-        <Link to="/friends" className="btn btn-link">
+        <Link to="/friends" className="btn btn-link btn-lg">
           Amis
         </Link>
-        <Link to="/meetings" className="btn btn-link">
+        <Link to="/meetings" className="btn btn-link btn-lg">
           Balades
         </Link>
       </section>
       <section className="navbar-center">
-        <button className="btn btn-primary btn-sm mx-2" onClick={event => logout(event)}>
+        <button className="btn btn-primary mx-2" onClick={event => logout(event)}>
           <i className="icon icon-shutdown" />
         </button>
       </section>
