@@ -195,10 +195,17 @@ export default class Map extends React.Component<MapProps, MapState> {
     }
   };
 
+  private getMapHeight = () => {
+    const menuHeight = 49;
+    const viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    return viewportHeight - menuHeight + 'px';
+  }
+
   public render() {
+
     return (
       <React.Fragment>
-        <div id="map" style={{width: '100vw', height: '95vh'}} className="map-container" />
+        <div id="map" style={{width: '100vw', height: this.getMapHeight()}} className="map-container" />
         {this.renderActiveModal()}
       </React.Fragment>
     );
