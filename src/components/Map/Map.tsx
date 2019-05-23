@@ -8,6 +8,7 @@ import AddPlace from './AddPlace';
 import PlaceDetailsModal from './PlaceDetailsModal';
 import {PlaceDetails} from '../../store/meetings/createMeeting';
 import CreateMeeting from './CreateMeeting';
+import CreateMeetingButton from './CreateMeetingButton';
 
 declare const MAPBOX_TOKEN: string;
 declare const MAPBOX_STYLE: string;
@@ -30,12 +31,17 @@ interface DispatchProps {
   createMeeting: (placeId: number) => void;
 }
 
+enum MapModal {
+  AddPlace,
+  PlaceDetails,
+  CreateMeeting,
+  CreateMeetingButton,
+}
+
 type MapProps = MapStore.MapState & MeetingsStore.CreateMeetingState & DispatchProps;
 
 interface MapState {
-  showAddModal: boolean;
-  showDetailsModal: boolean;
-  showMeetingModal: boolean;
+  activeModal: MapModal;
   placeDetails: PlaceDetails;
 }
 
@@ -46,9 +52,7 @@ export default class Map extends React.Component<MapProps, MapState> {
   public constructor(props: MapProps) {
     super(props);
     this.state = {
-      showAddModal: false,
-      showDetailsModal: false,
-      showMeetingModal: false,
+      activeModal: MapModal.CreateMeetingButton,
       placeDetails: {
         id: 0,
         name: '',
@@ -78,7 +82,7 @@ export default class Map extends React.Component<MapProps, MapState> {
         distance: 0,
       };
 
-      this.setState({showDetailsModal: true, placeDetails: details});
+      this.setState({activeModal: MapModal.PlaceDetails, placeDetails: details});
     }
   }
 
@@ -130,8 +134,7 @@ export default class Map extends React.Component<MapProps, MapState> {
       this.map.on('contextmenu', e => {
         this.addPlaceMarker.remove();
         this.addPlaceMarker = new mapboxgl.Marker().setLngLat(e.lngLat).addTo(this.map);
-        this.setState({showAddModal: true});
-        this.closeDetails();
+        this.setState({activeModal: MapModal.AddPlace});
         this.props.setPlaceCoordinates(e.lngLat);
       });
       this.map.on('click', 'parks', e => {
@@ -151,33 +154,38 @@ export default class Map extends React.Component<MapProps, MapState> {
     }
   };
 
+  public resetModals = () => {
+    this.setState({activeModal: MapModal.CreateMeetingButton});
+  };
+
   public cancelAddPlace = () => {
-    this.setState({showAddModal: false});
+    this.resetModals();
     this.addPlaceMarker.remove();
   };
 
-  public closeDetails = () => {
-    this.setState({showDetailsModal: false});
-  };
-  public closeMeeting = () => {
-    this.setState({showMeetingModal: false});
+  public renderActiveModal = () => {
+    const {placeDetails, activeModal} = this.state;
+    const {addPlace, deletePlace, getPlacesByDistance, meetingPlaces, createMeeting} = this.props;
+
+    switch (activeModal) {
+      case MapModal.AddPlace:
+        return <AddPlace close={this.cancelAddPlace} addPlace={addPlace} />;
+      case MapModal.PlaceDetails:
+        return <PlaceDetailsModal {...placeDetails} close={this.resetModals} delete={deletePlace} />;
+      case MapModal.CreateMeeting:
+        return (
+          <CreateMeeting loadPlaces={getPlacesByDistance} close={this.resetModals} places={meetingPlaces} createMeeting={createMeeting} />
+        );
+      case MapModal.CreateMeetingButton:
+        return <CreateMeetingButton click={() => this.setState({activeModal: MapModal.CreateMeeting})} />;
+    }
   };
 
   public render() {
-    const {showAddModal, showDetailsModal, placeDetails, showMeetingModal} = this.state;
-    const {addPlace, deletePlace, getPlacesByDistance, meetingPlaces, createMeeting} = this.props;
-
     return (
       <React.Fragment>
         <div id="map" style={{width: '100vw', height: '95vh'}} className="map-container" />
-        {showAddModal && <AddPlace close={this.cancelAddPlace} addPlace={addPlace} />}
-        {showDetailsModal && <PlaceDetailsModal {...placeDetails} close={this.closeDetails} delete={deletePlace} />}
-        {showMeetingModal && <CreateMeeting loadPlaces={getPlacesByDistance} close={this.closeMeeting} places={meetingPlaces} createMeeting={createMeeting} />}
-        {!showMeetingModal && (
-          <button className="btn btn-lg btn-primary fixed-bottom p-centered my-2" onClick={() => this.setState({showMeetingModal: true})}>
-            Démarrer une balade
-          </button>
-        )}
+        {this.renderActiveModal()}
       </React.Fragment>
     );
   }
