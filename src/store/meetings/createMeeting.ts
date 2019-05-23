@@ -69,8 +69,10 @@ export const actionCreators = {
       dispatch({type: CREATE_MEETING_START, isLoading: true});
       return axios
         .post('/meeting', {placeId})
-        .then(() => {
+        .then((response: any) => {
           dispatch({type: CREATE_MEETING_SUCCESS, isLoading: false});
+          const {meetingId} = response.data;
+          dispatch({type: 'CHECK_MEETINGS_SUCCESS', isLoading: false, onGoingMeetingId: meetingId});
           ToastsStore.success('La balade est lancée!');
         })
         .catch(() => {
