@@ -9,7 +9,9 @@ import PlaceDetailsModal from './PlaceDetailsModal';
 import {PlaceDetails} from '../../store/meetings/createMeeting';
 import CreateMeeting from './CreateMeeting';
 import CreateMeetingButton from './CreateMeetingButton';
-import OnGoingMeetingButton from './OnGoingMeetingButton';
+import CancelMeetingButton from './CancelMeetingButton';
+import {Fragment} from 'react';
+import CurrentMeetingButton from './CurrentMeetingButton';
 
 declare const MAPBOX_TOKEN: string;
 declare const MAPBOX_STYLE: string;
@@ -31,6 +33,7 @@ interface DispatchProps {
   getPlacesByDistance: () => Promise<void>;
   createMeeting: (placeId: number) => void;
   getOnGoingMeeting: () => void;
+  cancelMeeting: (meetingId: number) => void;
 }
 
 enum MapModal {
@@ -169,7 +172,7 @@ export default class Map extends React.Component<MapProps, MapState> {
 
   public renderActiveModal = () => {
     const {placeDetails, activeModal} = this.state;
-    const {addPlace, deletePlace, getPlacesByDistance, meetingPlaces, createMeeting, onGoingMeetingId} = this.props;
+    const {addPlace, deletePlace, getPlacesByDistance, meetingPlaces, createMeeting, onGoingMeetingId, cancelMeeting} = this.props;
 
     switch (activeModal) {
       case MapModal.AddPlace:
@@ -182,7 +185,10 @@ export default class Map extends React.Component<MapProps, MapState> {
         );
       case MapModal.CreateMeetingButton:
         return onGoingMeetingId ? (
-          <OnGoingMeetingButton meetingId={onGoingMeetingId} />
+          <Fragment>
+            <CurrentMeetingButton meetingId={onGoingMeetingId} />
+            <CancelMeetingButton meetingId={onGoingMeetingId} cancelMeeting={cancelMeeting} />
+          </Fragment>
         ) : (
           <CreateMeetingButton click={() => this.setState({activeModal: MapModal.CreateMeeting})} />
         );

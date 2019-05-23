@@ -15,6 +15,7 @@ interface DispatchProps {
   getPlacesByDistance: () => Promise<void>;
   createMeeting: (placeId: number) => void;
   getOnGoingMeeting: () => void;
+  cancelMeeting: (meetingId: number) => void;
 }
 
 type MapContainerProps = MapStore.MapState & MeetingsStore.CreateMeetingState & DispatchProps;

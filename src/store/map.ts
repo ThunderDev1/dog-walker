@@ -25,6 +25,10 @@ const CHECK_MEETINGS_START = 'CHECK_MEETINGS_START';
 const CHECK_MEETINGS_SUCCESS = 'CHECK_MEETINGS_SUCCESS';
 const CHECK_MEETINGS_FAILURE = 'CHECK_MEETINGS_FAILURE';
 
+const CANCEL_MEETING_START = 'CANCEL_MEETING_START';
+const CANCEL_MEETING_SUCCESS = 'CANCEL_MEETING_SUCCESS';
+const CANCEL_MEETING_FAILURE = 'CANCEL_MEETING_FAILURE';
+
 export interface MapState {
   lastPosition: mapboxgl.LngLat;
   lastZoom: number;
@@ -32,6 +36,22 @@ export interface MapState {
   isLoading: boolean;
   geoData: GeoJSON.FeatureCollection<GeoJSON.GeometryObject>;
   onGoingMeetingId: number;
+}
+
+interface CancelMeetingStartAction {
+  type: typeof CANCEL_MEETING_START;
+  isLoading: boolean;
+}
+
+interface CancelMeetingSuccessAction {
+  type: typeof CANCEL_MEETING_SUCCESS;
+  onGoingMeetingId: number;
+  isLoading: boolean;
+}
+
+interface CancelMeetingFailureAction {
+  type: typeof CANCEL_MEETING_FAILURE;
+  isLoading: boolean;
 }
 
 interface CheckMeetingsStartAction {
@@ -121,7 +141,10 @@ export type MapActionTypes =
   | DeletePlaceFailureAction
   | CheckMeetingsStartAction
   | CheckMeetingsSuccessAction
-  | CheckMeetingsFailureAction;
+  | CheckMeetingsFailureAction
+  | CancelMeetingStartAction
+  | CancelMeetingSuccessAction
+  | CancelMeetingFailureAction;
 
 export const actionCreators = {
   addPlace: (placeTypeId: number, placeName: string) => {
@@ -223,9 +246,25 @@ export const actionCreators = {
     };
   },
 
+  cancelMeeting: (meetingId: number) => {
+    return async (dispatch: ThunkDispatch<{}, {}, any>) => {
+      dispatch({type: CANCEL_MEETING_START, isLoading: true});
+      return axios
+        .get(`/meeting/cancel/${meetingId}`)
+        .then(() => {
+          dispatch({type: CANCEL_MEETING_SUCCESS, isLoading: false, onGoingMeetingId: 0});
+          ToastsStore.success('Balade arrêtée');
+        })
+        .catch(() => {
+          dispatch({type: CANCEL_MEETING_FAILURE, isLoading: false});
+        });
+    };
+  },
+
   setPlaceCoordinates: (position: mapboxgl.LngLat) => (dispatch: Dispatch) => {
     dispatch({type: SET_COORDINATES, placeCoordinates: position});
   },
+
   updateLastPosition: (position: mapboxgl.LngLat, zoom: number) => (dispatch: Dispatch) => {
     dispatch({type: UPDATE_LAST_MAP_POSITION, lastPosition: position, lastZoom: zoom});
   },
@@ -274,6 +313,12 @@ export const reducer = (state = initialState, action: MapActionTypes): MapState 
     case CHECK_MEETINGS_SUCCESS:
       return {...state, isLoading: action.isLoading, onGoingMeetingId: action.onGoingMeetingId};
     case CHECK_MEETINGS_FAILURE:
+      return {...state, isLoading: action.isLoading};
+    case CANCEL_MEETING_START:
+      return {...state, isLoading: action.isLoading};
+    case CANCEL_MEETING_SUCCESS:
+      return {...state, isLoading: action.isLoading, onGoingMeetingId: action.onGoingMeetingId};
+    case CANCEL_MEETING_FAILURE:
       return {...state, isLoading: action.isLoading};
     default:
       return state;

@@ -33,7 +33,7 @@ const CreateMeeting = (props: CreateMeetingProps) => {
   return (
     <div className="card fixed-bottom m-2" style={{maxHeight: '85%'}}>
       <div className="card-header">
-        <div className="card-title h5">Cliquez sur le lieu de la balade</div>
+        <div className="card-title h5">Choisissez un lieu</div>
       </div>
       <div className="card-body" style={{overflowX: 'scroll'}}>
         {props.places.length === 0 && renderEmptyView()}
@@ -46,11 +46,11 @@ const CreateMeeting = (props: CreateMeetingProps) => {
               <p className="tile-title">{place.name}</p>
               <small className="tile-subtitle text-gray">{`${Math.floor(place.distance * 100000)}m`}</small>
             </div>
-            <div className="tile-action">
+            {selectedPlace === place.id && <div className="tile-action">
               <button className="btn btn-link">
                 <i className="icon icon-check" />
               </button>
-            </div>
+            </div>}
           </div>
         ))}
       </div>
@@ -62,7 +62,7 @@ const CreateMeeting = (props: CreateMeetingProps) => {
             </button>
           </div>
           <div className="column col-6">
-            <button className="btn btn-primary p-centered" onClick={() => handleSubmit()}>
+            <button className={`btn btn-primary p-centered ${selectedPlace ? '' : 'disabled'}`} onClick={() => handleSubmit()}>
               Valider
             </button>
           </div>
