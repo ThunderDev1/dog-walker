@@ -6,8 +6,8 @@ interface StatusLabelProps {
 }
 
 const StatusLabel = (props: StatusLabelProps) => {
-  const now = moment();
-  const isPastEvent = moment(props.date, moment.ISO_8601).diff(now) < 0;
+  const now = moment.utc();
+  const isPastEvent = moment.utc(props.date, moment.ISO_8601).diff(now) < 0;
   if (isPastEvent) {
     return <span className="label label-warning">Terminé</span>;
   } else {

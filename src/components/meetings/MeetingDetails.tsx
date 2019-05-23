@@ -23,9 +23,9 @@ const MeetingDetails = (props: MeetingDetailsProps) => {
   }, []);
 
   const {meeting} = props;
-  const subtitle = `Créé par ${meeting.isCreator ? 'vous' : meeting.creatorName} ${moment(meeting.startDate).fromNow()}`;
-  const isHappening = moment(meeting.endDate, moment.ISO_8601).diff(moment()) > 0;
-  const remainingTime = moment(meeting.endDate, moment.ISO_8601).fromNow();
+  const subtitle = `Créé par ${meeting.isCreator ? 'vous' : meeting.creatorName} ${moment.utc(meeting.startDate).fromNow()}`;
+  const isHappening = moment.utc(meeting.endDate, moment.ISO_8601).diff(moment.utc()) > 0;
+  const remainingTime = moment.utc(meeting.endDate, moment.ISO_8601).fromNow();
   const showActions = !meeting.isCreator && meeting.status == MeetingStatus.Pending && isHappening;
 
   return (
