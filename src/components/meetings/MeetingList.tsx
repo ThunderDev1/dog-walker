@@ -26,27 +26,29 @@ const MeetingList = (props: MeetingListProps) => {
   };
 
   return (
-    <div className="container my-2">
+    <React.Fragment>
       {!props.isLoading && props.meetingList.length == 0 && renderEmptyView()}
-      {props.meetingList.map(meeting => (
-        <Link to={`/meeting/${meeting.meetingId}`} key={meeting.meetingId}>
-          <div className="tile tile-centered my-2">
-            <div className="tile-icon">
-              <figure className="avatar avatar-lg" data-initial="?">
-                {meeting.creatorAvatarUrl && <img src={meeting.creatorAvatarUrl} alt="Avatar" />}
-              </figure>
+      <div className="container my-2">
+        {props.meetingList.map(meeting => (
+          <Link to={`/meeting/${meeting.meetingId}`} key={meeting.meetingId}>
+            <div className="tile tile-centered my-2">
+              <div className="tile-icon">
+                <figure className="avatar avatar-lg" data-initial="?">
+                  {meeting.creatorAvatarUrl && <img src={meeting.creatorAvatarUrl} alt="Avatar" />}
+                </figure>
+              </div>
+              <div className="tile-content">
+                <p className="tile-title">{meeting.title}</p>
+                <small className="tile-subtitle text-gray">{meeting.placeName}</small>
+              </div>
+              <div className="tile-action">
+                <StatusLabel date={meeting.endDate} />
+              </div>
             </div>
-            <div className="tile-content">
-              <p className="tile-title">{meeting.title}</p>
-              <small className="tile-subtitle text-gray">{meeting.placeName}</small>
-            </div>
-            <div className="tile-action">
-              <StatusLabel date={meeting.endDate} />
-            </div>
-          </div>
-        </Link>
-      ))}
-    </div>
+          </Link>
+        ))}
+      </div>
+    </React.Fragment>
   );
 };
 
