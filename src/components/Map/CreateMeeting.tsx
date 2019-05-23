@@ -17,7 +17,7 @@ const CreateMeeting = (props: CreateMeetingProps) => {
   }, []);
 
   const handleSubmit = () => {
-    props.createMeeting(selectedPlace)
+    props.createMeeting(selectedPlace);
     props.close();
   };
 
@@ -31,11 +31,11 @@ const CreateMeeting = (props: CreateMeetingProps) => {
   };
 
   return (
-    <div className="card fixed-bottom m-2">
+    <div className="card fixed-bottom m-2" style={{maxHeight: '85%'}}>
       <div className="card-header">
         <div className="card-title h5">Cliquez sur le lieu de la balade</div>
       </div>
-      <div className="card-body">
+      <div className="card-body" style={{overflowX: 'scroll'}}>
         {props.places.length === 0 && renderEmptyView()}
         {props.places.map((place: PlaceDetails) => (
           <div
@@ -55,12 +55,18 @@ const CreateMeeting = (props: CreateMeetingProps) => {
         ))}
       </div>
       <div className="card-footer">
-        <button className="btn btn-secondary" onClick={() => props.close()}>
-          Annuler
-        </button>
-        <button className="btn btn-primary mx-1" onClick={() => handleSubmit()}>
-          Valider
-        </button>
+        <div className="columns">
+          <div className="column col-6">
+            <button className="btn p-centered" onClick={() => props.close()}>
+              Annuler
+            </button>
+          </div>
+          <div className="column col-6">
+            <button className="btn btn-primary p-centered" onClick={() => handleSubmit()}>
+              Valider
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
