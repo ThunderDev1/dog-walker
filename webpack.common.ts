@@ -1,8 +1,8 @@
 /* eslint @typescript-eslint/camelcase: 0 */
 import * as webpack from 'webpack';
+import * as path from 'path';
 import * as HtmlWebPackPlugin from 'html-webpack-plugin';
 import * as WebpackPwaManifest from 'webpack-pwa-manifest';
-import * as path from 'path';
 
 const config: webpack.Configuration = {
   entry: {
@@ -30,10 +30,6 @@ const config: webpack.Configuration = {
         use: ['html-loader'],
       },
       {
-        test: /\.(scss|css)$/,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
-      },
-      {
         test: /\.(png|jpg|jpeg|gif|svg)$/,
         use: ['url-loader?limit=25000'],
       },
@@ -44,7 +40,7 @@ const config: webpack.Configuration = {
     new HtmlWebPackPlugin({
       template: './index.html',
       favicon: 'favicon.ico',
-      chunks: ['main'],
+      excludeChunks: ['silentRenew'],
     }),
     new HtmlWebPackPlugin({
       template: './silentRenew/silentRenew.html',
@@ -60,10 +56,10 @@ const config: webpack.Configuration = {
       icons: [
         {
           src: path.resolve('src/assets/icon.png'),
-          sizes: [96, 128, 192, 256, 384, 512] // multiple sizes
+          sizes: [96, 128, 192, 256, 384, 512], // multiple sizes
         },
-      ]
-    })
+      ],
+    }),
   ],
 };
 
