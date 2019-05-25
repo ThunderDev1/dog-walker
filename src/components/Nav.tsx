@@ -10,7 +10,7 @@ const Nav = () => {
   };
 
   return (
-    <header className="navbar py-1">
+    <header className="navbar py-1 p-sticky">
       <section className="navbar-section">
         <Link to="/" className="btn btn-link btn-lg">
           Carte
