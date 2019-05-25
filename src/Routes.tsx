@@ -13,6 +13,8 @@ import AuthRoutes from './AuthRoutes';
 import Spinner from './components/Spinner';
 import {actionCreators, ProfileState} from './store/profile';
 import {ThunkDispatch} from 'redux-thunk';
+import * as OfflinePluginRuntime from 'offline-plugin/runtime';
+import {useEffect} from 'react';
 
 interface RoutesProps {
   user: User;
@@ -24,6 +26,12 @@ interface RoutesProps {
 }
 
 const Routes = (props: RoutesProps) => {
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      OfflinePluginRuntime.install();
+    }
+  }, []);
 
   // wait for user to be loaded, and location is known
   if (props.isLoadingUser || !props.location) {

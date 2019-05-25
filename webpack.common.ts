@@ -3,6 +3,8 @@ import * as webpack from 'webpack';
 import * as path from 'path';
 import * as HtmlWebPackPlugin from 'html-webpack-plugin';
 import * as WebpackPwaManifest from 'webpack-pwa-manifest';
+// @ts-ignore
+import * as OfflinePlugin  from 'offline-plugin';
 
 const config: webpack.Configuration = {
   entry: {
@@ -60,6 +62,7 @@ const config: webpack.Configuration = {
         },
       ],
     }),
+    new OfflinePlugin(),
   ],
 };
 
