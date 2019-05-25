@@ -16,6 +16,7 @@ interface DispatchProps {
   createMeeting: (placeId: number) => void;
   getOnGoingMeeting: () => void;
   cancelMeeting: (meetingId: number) => void;
+  updateLastPosition: (position: mapboxgl.LngLat, zoom: number) => void;
 }
 
 type MapContainerProps = MapStore.MapState & MeetingsStore.CreateMeetingState & DispatchProps;

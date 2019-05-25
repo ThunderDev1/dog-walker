@@ -1,7 +1,7 @@
 import * as React from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import * as mapboxgl from 'mapbox-gl';
-import {MapboxOptions, MapboxGeoJSONFeature} from 'mapbox-gl';
+import {MapboxGeoJSONFeature} from 'mapbox-gl';
 import * as MapStore from '../../store/map';
 import * as MeetingsStore from '../../store/meetings/createMeeting';
 import AddPlace from './AddPlace';
@@ -16,15 +16,6 @@ import CurrentMeetingButton from './CurrentMeetingButton';
 declare const MAPBOX_TOKEN: string;
 declare const MAPBOX_STYLE: string;
 
-const defaultMapProps: Partial<MapboxOptions> = {
-  style: MAPBOX_STYLE,
-  center: [-0.551228, 44.8694],
-  zoom: 14,
-  minZoom: 3,
-  maxZoom: 18,
-  pitchWithRotate: false,
-};
-
 interface DispatchProps {
   setPlaceCoordinates: (position: mapboxgl.LngLat) => void;
   addPlace: (placeTypeId: number, placeName: string) => void;
@@ -34,6 +25,7 @@ interface DispatchProps {
   createMeeting: (placeId: number) => void;
   getOnGoingMeeting: () => void;
   cancelMeeting: (meetingId: number) => void;
+  updateLastPosition: (position: mapboxgl.LngLat, zoom: number) => void;
 }
 
 enum MapModal {
@@ -96,9 +88,16 @@ export default class Map extends React.Component<MapProps, MapState> {
 
     (mapboxgl as any).accessToken = MAPBOX_TOKEN;
 
+    const {lastPosition, lastZoom} = this.props;
+
     this.map = new mapboxgl.Map({
       container: 'map',
-      ...defaultMapProps,
+      style: MAPBOX_STYLE,
+      center: [lastPosition.lng, lastPosition.lat],
+      zoom: lastZoom,
+      minZoom: 3,
+      maxZoom: 18,
+      pitchWithRotate: false,
     });
 
     const geolocateControl = new mapboxgl.GeolocateControl({
@@ -150,6 +149,11 @@ export default class Map extends React.Component<MapProps, MapState> {
       this.map.on('click', 'waste-bags', e => {
         e.features && this.showPlaceDetails(e.features[0]);
       });
+      this.map.on('moveend', () => {
+        const position = this.map.getCenter();
+        const zoom = this.map.getZoom();
+        this.props.updateLastPosition(position, zoom);
+      });
     });
   }
 
@@ -199,10 +203,9 @@ export default class Map extends React.Component<MapProps, MapState> {
     const menuHeight = 49;
     const viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
     return viewportHeight - menuHeight + 'px';
-  }
+  };
 
   public render() {
-
     return (
       <React.Fragment>
         <div id="map" style={{width: '100vw', height: this.getMapHeight()}} className="map-container" />

@@ -274,7 +274,7 @@ const bordeaux = new mapboxgl.LngLat(-0.551228, 44.8694);
 
 const initialState: MapState = {
   lastPosition: bordeaux,
-  lastZoom: 11,
+  lastZoom: 14,
   placeCoordinates: bordeaux,
   isLoading: false,
   geoData: {
