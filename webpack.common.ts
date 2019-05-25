@@ -54,7 +54,11 @@ const config: webpack.Configuration = {
       short_name: 'Nova',
       description: 'Application pour balader son chien',
       background_color: '#ffffff',
+      theme_color: '#ffffff',
       crossorigin: 'anonymous',
+      start_url: '.',
+      display: "standalone",
+      orientation: "portrait-primary",
       icons: [
         {
           src: path.resolve('src/assets/icon.png'),
