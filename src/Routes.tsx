@@ -8,21 +8,26 @@ import {AppState} from './store';
 
 import userManager from './userManager';
 import {User} from 'oidc-client';
-import {Dispatch} from 'redux';
 import Nav from './components/Nav';
 import AuthRoutes from './AuthRoutes';
+import Spinner from './components/Spinner';
+import {actionCreators, ProfileState} from './store/profile';
+import {ThunkDispatch} from 'redux-thunk';
 
 interface RoutesProps {
   user: User;
   isLoadingUser: boolean;
-  dispatch: Dispatch;
+  dispatch: ThunkDispatch<{}, {}, any>;
   location: any;
+  profile: ProfileState;
+  getOrCreateProfile: (authToken: string) => void;
 }
 
 const Routes = (props: RoutesProps) => {
+
   // wait for user to be loaded, and location is known
   if (props.isLoadingUser || !props.location) {
-    return <div>Loading...</div>;
+    return <Spinner />;
   }
 
   // if location is callback page, return only CallbackPage route to allow signin process
@@ -41,16 +46,16 @@ const Routes = (props: RoutesProps) => {
     }
   });
 
-  const isConnected: boolean = !!props.user;
+  const {getOrCreateProfile, user, profile} = props;
 
-  if (!isConnected) return <div>Loading...</div>;
+  if (!user) return <Spinner />; 
 
   return (
     <React.Fragment>
-      <Nav />
+      {profile.profile.name && <Nav />}
       <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} />
       <Switch>
-        <Route path="*" render={() => <AuthRoutes user={props.user} />} />
+        <Route path="*" render={() => <AuthRoutes accessToken={user.access_token} getOrCreateProfile={getOrCreateProfile} profile={profile} />} />
       </Switch>
     </React.Fragment>
   );
@@ -61,12 +66,14 @@ function mapStateToProps(state: AppState) {
     user: state.oidc.user,
     isLoadingUser: state.oidc.isLoadingUser,
     location: state.router.location,
+    profile: state.profile,
   };
 }
 
-function mapDispatchToProps(dispatch: Dispatch) {
+function mapDispatchToProps(dispatch: ThunkDispatch<{}, {}, any>) {
   return {
     dispatch,
+    getOrCreateProfile: (authToken: string) => dispatch(actionCreators.getOrCreateProfile(authToken)),
   };
 }
 

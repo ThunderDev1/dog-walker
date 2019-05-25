@@ -2,7 +2,7 @@ import * as React from 'react';
 import {connect} from 'react-redux';
 import {AppState} from '../store';
 import * as ProfileStore from '../store/profile';
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {FileUpload} from './utilities/FileUpload';
 
 interface DispatchProps {
@@ -14,6 +14,8 @@ interface DispatchProps {
 type UserProfileProps = ProfileStore.ProfileState & DispatchProps;
 
 const UserProfile = (props: UserProfileProps) => {
+  const {profile, isLoading, uploadAvatar} = props;
+  const [formValid, setFormValid] = useState(true);
   const nameRef = useRef<HTMLInputElement>(null);
   const descRef = useRef<HTMLInputElement>(null);
 
@@ -23,26 +25,42 @@ const UserProfile = (props: UserProfileProps) => {
 
   const handleSave = () => {
     const name = (nameRef.current && nameRef.current.value) || '';
-    const description = (descRef.current && descRef.current.value) || '';
-    props.updateProfile(name, description);
+    const canSubmit = profile.avatarUrl && name;
+    if (!canSubmit) {
+      setFormValid(false);
+    } else {
+      setFormValid(true);
+      const description = (descRef.current && descRef.current.value) || '';
+      props.updateProfile(name, description);
+    }
+  };
+
+  const renderRequiredMessage = () => {
+    if (!formValid) {
+      return (
+        <div className="text-center m-2">
+          <span className="text-error">Veuillez ajouter une photo et un nom</span>
+        </div>
+      );
+    } else {
+      return null;
+    }
   };
 
   const renderEmptyView = () => {
     return (
       <div className="empty">
-        <p className="empty-title h5">{`Vous n'avez pas de photo`}</p>
-        <p className="empty-subtitle">Cliquez ici pour ajouter une photo de votre chien</p>
+        <p className="empty-title h5">{`A quoi ressemble votre animal?`}</p>
+        <p className="empty-subtitle">Cliquez ici pour ajouter une photo :)</p>
       </div>
     );
   };
 
-  console.log(props.profile.avatarUrl);
-
   return (
     <div className="my-2">
-      <FileUpload submitFile={props.uploadAvatar} maxWidth={300} maxHeight={300} isUploading={false}>
-        {props.profile.avatarUrl ? (
-          <img src={props.profile.avatarUrl} alt="user avatar" className="s-circle p-centered" style={{height: '200px'}} />
+      <FileUpload submitFile={uploadAvatar} maxWidth={300} maxHeight={300} isUploading={false}>
+        {profile.avatarUrl ? (
+          <img src={profile.avatarUrl} alt="user avatar" className="s-circle p-centered" style={{height: '200px'}} />
         ) : (
           renderEmptyView()
         )}
@@ -51,20 +69,21 @@ const UserProfile = (props: UserProfileProps) => {
         <fieldset>
           <div className="form-group">
             <label className="form-label">Nom de votre animal</label>
-            <input type="text" ref={nameRef} className="form-input" defaultValue={props.profile.name} placeholder="ex: Nova" />
+            <input type="text" ref={nameRef} className="form-input" defaultValue={profile.name} placeholder="ex: Nova" />
             <label className="form-label">Description</label>
             <input
               className="form-input"
               type="text"
               ref={descRef}
-              defaultValue={props.profile.description}
+              defaultValue={profile.description}
               placeholder="ex: Chien plein d'énergie"
             />
             <label className="form-label">Email</label>
-            <input className="form-input" type="text" defaultValue={props.profile.email} disabled />
+            <input className="form-input" type="text" defaultValue={profile.email} disabled />
           </div>
         </fieldset>
-        <button className={'btn btn-primary p-centered' + (props.isLoading ? ' loading' : '')} onClick={() => handleSave()}>
+        {renderRequiredMessage()}
+        <button className={`btn btn-primary p-centered ${isLoading && ' loading'}`} onClick={() => handleSave()}>
           Sauvegarder
         </button>
       </div>

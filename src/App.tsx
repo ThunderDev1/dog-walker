@@ -5,13 +5,13 @@ import Routes from './Routes';
 import {Provider} from 'react-redux';
 import configureStore from './configureStore';
 import {ConnectedRouter} from 'connected-react-router';
-import {createHashHistory} from 'history';
+import {history} from './configureStore';
+
 import 'spectre.css/dist/spectre.min.css';
 import 'spectre.css/dist/spectre-icons.min.css';
 import './style/main.scss';
 
-const history = createHashHistory();
-const store = configureStore(history);
+const store = configureStore();
 
 const App: FunctionComponent<{}> = (): ReactElement => (
   <Provider store={store}>

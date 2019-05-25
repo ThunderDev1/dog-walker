@@ -3,6 +3,8 @@ import axios from 'axios';
 import {AppState} from '.';
 import {ToastsStore} from 'react-toasts';
 
+declare var API_URL: string;
+
 const LOAD_PROFILE_START = 'LOAD_PROFILE_START';
 const LOAD_PROFILE_SUCCESS = 'LOAD_PROFILE_SUCCESS';
 const LOAD_PROFILE_FAILURE = 'LOAD_PROFILE_FAILURE';
@@ -20,6 +22,7 @@ const UPDATE_PROFILE_SUCCESS = 'UPDATE_PROFILE_SUCCESS';
 const UPDATE_PROFILE_FAILURE = 'UPDATE_PROFILE_FAILURE';
 
 export interface Profile {
+  id: string;
   name: string;
   email: string;
   avatarUrl: string;
@@ -86,6 +89,7 @@ interface UpdateProfileStartAction {
 interface UpdateProfileSuccessAction {
   type: typeof UPDATE_PROFILE_SUCCESS;
   name: string;
+  description: string;
   isLoading: boolean;
 }
 
@@ -109,14 +113,16 @@ export type ProfileActionTypes =
   | UpdateProfileFailureAction;
 
 export const actionCreators = {
-  getProfile: () => {
+  getOrCreateProfile: (authToken: string) => {
     return async (dispatch: ThunkDispatch<{}, {}, any>, getState: () => AppState) => {
       dispatch({type: LOAD_PROFILE_START, isLoading: true});
+      // special case where axios is not yet initialized, pass auth token manually
       return axios
-        .get('/profile')
+        .get(`${API_URL}/profile`, {
+          headers: {Authorization: 'Bearer ' + authToken},
+        })
         .then((response: any) => {
           const user = response.data;
-
           if (user) {
             dispatch({type: LOAD_PROFILE_SUCCESS, isLoading: false, profile: user});
           } else {
@@ -130,6 +136,20 @@ export const actionCreators = {
                 dispatch({type: LOAD_PROFILE_FAILURE, isLoading: false});
               });
           }
+        })
+        .catch(() => {
+          dispatch({type: LOAD_PROFILE_FAILURE, isLoading: false});
+        });
+    };
+  },
+  getProfile: () => {
+    return async (dispatch: ThunkDispatch<{}, {}, any>) => {
+      dispatch({type: LOAD_PROFILE_START, isLoading: true});
+      return axios
+        .get('/profile')
+        .then((response: any) => {
+          const user = response.data;
+          dispatch({type: LOAD_PROFILE_SUCCESS, isLoading: false, profile: user});
         })
         .catch(() => {
           dispatch({type: LOAD_PROFILE_FAILURE, isLoading: false});
@@ -174,7 +194,7 @@ export const actionCreators = {
     axios
       .post('/profile/update', {name, description})
       .then(() => {
-        dispatch({type: UPDATE_PROFILE_SUCCESS, isLoading: false});
+        dispatch({type: UPDATE_PROFILE_SUCCESS, isLoading: false, name, description});
         ToastsStore.success('Profil mis à jour ✔️');
       })
       .catch(() => {
@@ -186,6 +206,7 @@ export const actionCreators = {
 const initialState: ProfileState = {
   isLoading: false,
   profile: {
+    id: '',
     name: '',
     email: '',
     avatarUrl: '',
@@ -216,7 +237,7 @@ export const reducer = (state = initialState, action: ProfileActionTypes): Profi
     case UPDATE_PROFILE_START:
       return {...state, isLoading: action.isLoading};
     case UPDATE_PROFILE_SUCCESS:
-      return {...state, isLoading: action.isLoading};
+      return {...state, isLoading: action.isLoading, profile: {...state.profile, name: action.name, description: action.description}};
     case UPDATE_PROFILE_FAILURE:
       return {...state, isLoading: action.isLoading};
     default:

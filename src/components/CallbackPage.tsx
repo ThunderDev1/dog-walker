@@ -5,6 +5,7 @@ import {push} from 'connected-react-router';
 import userManager from './../userManager';
 import {Dispatch} from 'redux';
 import {useEffect} from 'react';
+import Spinner from './Spinner';
 
 interface CallbackPageProps {
   dispatch: Dispatch;
@@ -36,7 +37,7 @@ const CallbackPage = (props: CallbackPageProps) => {
       .catch(error => errorCallback(error));
   });
 
-  return <div>Loading...</div>;
+  return <Spinner />;
 };
 
 export default connect()(CallbackPage);
