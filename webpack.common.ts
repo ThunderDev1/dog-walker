@@ -5,6 +5,7 @@ import * as HtmlWebPackPlugin from 'html-webpack-plugin';
 import * as WebpackPwaManifest from 'webpack-pwa-manifest';
 // @ts-ignore
 import * as OfflinePlugin from 'offline-plugin';
+import CleanWebpackPlugin from 'clean-webpack-plugin';
 
 const config: webpack.Configuration = {
   entry: {
@@ -39,6 +40,8 @@ const config: webpack.Configuration = {
   },
 
   plugins: [
+    new webpack.ProgressPlugin(),
+    new CleanWebpackPlugin(),
     new HtmlWebPackPlugin({
       template: './index.html',
       favicon: 'favicon.ico',
@@ -57,8 +60,8 @@ const config: webpack.Configuration = {
       theme_color: '#ffffff',
       crossorigin: 'anonymous',
       start_url: '.',
-      display: "standalone",
-      orientation: "portrait-primary",
+      display: 'standalone',
+      orientation: 'portrait-primary',
       icons: [
         {
           src: path.resolve('src/assets/icon.png'),
