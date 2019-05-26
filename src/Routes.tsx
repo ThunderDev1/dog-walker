@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useEffect} from 'react';
 import {connect} from 'react-redux';
 import {Route, Switch} from 'react-router-dom';
 import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
@@ -14,7 +15,9 @@ import Spinner from './components/Spinner';
 import {actionCreators, ProfileState} from './store/profile';
 import {ThunkDispatch} from 'redux-thunk';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
-import {useEffect} from 'react';
+import * as firebase from 'firebase/app';
+import 'firebase/messaging';
+import firebaseConfig from '../config/firebase';
 
 interface RoutesProps {
   user: User;
@@ -26,10 +29,13 @@ interface RoutesProps {
 }
 
 const Routes = (props: RoutesProps) => {
-
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       OfflinePluginRuntime.install();
+      navigator.serviceWorker.ready.then(registration => {
+        firebase.initializeApp(firebaseConfig);
+        firebase.messaging().useServiceWorker(registration);
+      });
     }
   }, []);
 
@@ -56,14 +62,17 @@ const Routes = (props: RoutesProps) => {
 
   const {getOrCreateProfile, user, profile} = props;
 
-  if (!user) return <Spinner />; 
+  if (!user) return <Spinner />;
 
   return (
     <React.Fragment>
       {profile.profile.name && <Nav />}
       <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} />
       <Switch>
-        <Route path="*" render={() => <AuthRoutes accessToken={user.access_token} getOrCreateProfile={getOrCreateProfile} profile={profile} />} />
+        <Route
+          path="*"
+          render={() => <AuthRoutes accessToken={user.access_token} getOrCreateProfile={getOrCreateProfile} profile={profile} />}
+        />
       </Switch>
     </React.Fragment>
   );

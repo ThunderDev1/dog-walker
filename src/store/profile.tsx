@@ -2,6 +2,7 @@ import {ThunkDispatch} from 'redux-thunk';
 import axios from 'axios';
 import {AppState} from '.';
 import {ToastsStore} from 'react-toasts';
+import {unsubscribeUser, subscribeUser} from '../utils/pushToken';
 
 declare var API_URL: string;
 
@@ -21,16 +22,37 @@ const UPDATE_PROFILE_START = 'UPDATE_PROFILE_START';
 const UPDATE_PROFILE_SUCCESS = 'UPDATE_PROFILE_SUCCESS';
 const UPDATE_PROFILE_FAILURE = 'UPDATE_PROFILE_FAILURE';
 
+const TOGGLE_PUSH_NOTIFICATIONS_START = 'TOGGLE_PUSH_NOTIFICATIONS_START';
+const TOGGLE_PUSH_NOTIFICATIONS_SUCCESS = 'TOGGLE_PUSH_NOTIFICATIONS_SUCCESS';
+const TOGGLE_PUSH_NOTIFICATIONS_FAILURE = 'TOGGLE_PUSH_NOTIFICATIONS_FAILURE';
+
 export interface Profile {
   id: string;
   name: string;
   email: string;
   avatarUrl: string;
   description: string;
+  pushToken: string;
 }
 
 export interface ProfileState {
   profile: Profile;
+  isLoading: boolean;
+}
+
+interface TogglePushNotifStartAction {
+  type: typeof TOGGLE_PUSH_NOTIFICATIONS_START;
+  isLoading: boolean;
+}
+
+interface TogglePushNotifSuccessAction {
+  type: typeof TOGGLE_PUSH_NOTIFICATIONS_SUCCESS;
+  pushToken: string;
+  isLoading: boolean;
+}
+
+interface TogglePushNotifFailureAction {
+  type: typeof TOGGLE_PUSH_NOTIFICATIONS_FAILURE;
   isLoading: boolean;
 }
 
@@ -49,6 +71,7 @@ interface LoadProfileFailureAction {
   type: typeof LOAD_PROFILE_FAILURE;
   isLoading: boolean;
 }
+
 interface LoadPublicProfileStartAction {
   type: typeof LOAD_PUBLIC_PROFILE_START;
   isLoading: boolean;
@@ -110,7 +133,10 @@ export type ProfileActionTypes =
   | UploadAvatarFailureAction
   | UpdateProfileStartAction
   | UpdateProfileSuccessAction
-  | UpdateProfileFailureAction;
+  | UpdateProfileFailureAction
+  | TogglePushNotifStartAction
+  | TogglePushNotifSuccessAction
+  | TogglePushNotifFailureAction;
 
 export const actionCreators = {
   getOrCreateProfile: (authToken: string) => {
@@ -201,6 +227,20 @@ export const actionCreators = {
         dispatch({type: UPDATE_PROFILE_FAILURE, isLoading: false});
       });
   },
+
+  togglePushNotifs: () => {
+    return async (dispatch: ThunkDispatch<{}, {}, any>, getState: () => AppState) => {
+      dispatch({type: TOGGLE_PUSH_NOTIFICATIONS_START, isLoading: true});
+
+      const {pushToken} = getState().profile.profile;
+
+      const success = (token: string) => dispatch({type: TOGGLE_PUSH_NOTIFICATIONS_SUCCESS, isLoading: false, pushToken: token});
+      const error = () => dispatch({type: TOGGLE_PUSH_NOTIFICATIONS_FAILURE, isLoading: false});
+
+      if (pushToken) unsubscribeUser(success, error);
+      else subscribeUser(success, error);
+    };
+  },
 };
 
 const initialState: ProfileState = {
@@ -211,6 +251,7 @@ const initialState: ProfileState = {
     email: '',
     avatarUrl: '',
     description: '',
+    pushToken: '',
   },
 };
 
@@ -239,6 +280,12 @@ export const reducer = (state = initialState, action: ProfileActionTypes): Profi
     case UPDATE_PROFILE_SUCCESS:
       return {...state, isLoading: action.isLoading, profile: {...state.profile, name: action.name, description: action.description}};
     case UPDATE_PROFILE_FAILURE:
+      return {...state, isLoading: action.isLoading};
+    case TOGGLE_PUSH_NOTIFICATIONS_START:
+      return {...state, isLoading: action.isLoading};
+    case TOGGLE_PUSH_NOTIFICATIONS_SUCCESS:
+      return {...state, isLoading: action.isLoading, profile: {...state.profile, pushToken: action.pushToken}};
+    case TOGGLE_PUSH_NOTIFICATIONS_FAILURE:
       return {...state, isLoading: action.isLoading};
     default:
       return state;

@@ -9,12 +9,13 @@ interface DispatchProps {
   getProfile: () => void;
   uploadAvatar: (fileBase64: string, fileType: string, fileName: string) => Promise<void>;
   updateProfile: (name: string, description: string) => void;
+  togglePushNotifs: () => void;
 }
 
 type UserProfileProps = ProfileStore.ProfileState & DispatchProps;
 
 const UserProfile = (props: UserProfileProps) => {
-  const {profile, isLoading, uploadAvatar} = props;
+  const {profile, isLoading, uploadAvatar, togglePushNotifs} = props;
   const [formValid, setFormValid] = useState(true);
   const nameRef = useRef<HTMLInputElement>(null);
   const descRef = useRef<HTMLInputElement>(null);
@@ -80,6 +81,10 @@ const UserProfile = (props: UserProfileProps) => {
             />
             <label className="form-label">Email</label>
             <input className="form-input" type="text" defaultValue={profile.email} disabled />
+            <label className="form-switch my-2">
+              <input type="checkbox" checked={!!profile.pushToken} onChange={() => togglePushNotifs()} />
+              <i className="form-icon" />Notifications
+            </label>
           </div>
         </fieldset>
         {renderRequiredMessage()}

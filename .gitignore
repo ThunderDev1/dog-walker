@@ -10,3 +10,4 @@ coverage
 lib
 publish.ps1
 webpack.prod.ts
+config

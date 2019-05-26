@@ -67,6 +67,7 @@ const config: webpack.Configuration = {
       ],
     }),
     new OfflinePlugin({
+      responseStrategy: 'network-first',
       ServiceWorker: {
         entry: './serviceWorker.js',
       },
