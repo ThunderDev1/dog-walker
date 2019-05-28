@@ -67,8 +67,8 @@ export default class Map extends React.Component<MapProps, MapState> {
       // center on marquer
       const placeCoordinates = (feature.geometry as any).coordinates;
       this.map.easeTo({
-        center: [placeCoordinates[0], placeCoordinates[1] - 0.0005],
-        zoom: 16,
+        center: [placeCoordinates[0], placeCoordinates[1] - 0.0015],
+        zoom: 14,
       });
       var details: PlaceDetails = {
         id: feature.properties['id'],

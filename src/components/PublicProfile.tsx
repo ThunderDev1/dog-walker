@@ -26,8 +26,6 @@ const PublicProfile = (props: PublicProfileProps) => {
     );
   };
 
-  console.log(props.profile.avatarUrl);
-
   return (
     <div className="my-2">
       {props.profile.avatarUrl ? (

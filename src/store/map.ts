@@ -270,11 +270,11 @@ export const actionCreators = {
   },
 };
 
-const bordeaux = new mapboxgl.LngLat(-0.551228, 44.8694);
+const bordeaux = new mapboxgl.LngLat(-0.5787, 44.8367);
 
 const initialState: MapState = {
   lastPosition: bordeaux,
-  lastZoom: 14,
+  lastZoom: 13,
   placeCoordinates: bordeaux,
   isLoading: false,
   geoData: {
