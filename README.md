@@ -2,7 +2,7 @@
 
 React typescript demo app to invite fellow dog owners to walks with your dog :)
 
-![Demo Gif](https://statics.blob.core.windows.net/public/dog-walker2.gif)
+![Demo Gif](https://statics.blob.core.windows.net/public/dog-walker3.gif)
 
 The app showcases the following features:
 
