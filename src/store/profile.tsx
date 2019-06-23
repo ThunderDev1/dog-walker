@@ -140,7 +140,7 @@ export type ProfileActionTypes =
 
 export const actionCreators = {
   getOrCreateProfile: (authToken: string) => {
-    return async (dispatch: ThunkDispatch<{}, {}, any>, getState: () => AppState) => {
+    return async (dispatch: ThunkDispatch<{}, {}, any>) => {
       dispatch({type: LOAD_PROFILE_START, isLoading: true});
       // special case where axios is not yet initialized, pass auth token manually
       return axios
@@ -149,19 +149,7 @@ export const actionCreators = {
         })
         .then((response: any) => {
           const user = response.data;
-          if (user) {
-            dispatch({type: LOAD_PROFILE_SUCCESS, isLoading: false, profile: user});
-          } else {
-            const email = getState().oidc.user.profile.name;
-            axios
-              .post('/profile', {email})
-              .then((response: any) => {
-                dispatch({type: LOAD_PROFILE_SUCCESS, isLoading: false, profile: response.data});
-              })
-              .catch(() => {
-                dispatch({type: LOAD_PROFILE_FAILURE, isLoading: false});
-              });
-          }
+          dispatch({type: LOAD_PROFILE_SUCCESS, isLoading: false, profile: user});
         })
         .catch(() => {
           dispatch({type: LOAD_PROFILE_FAILURE, isLoading: false});
