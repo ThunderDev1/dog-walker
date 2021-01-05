@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@hot-loader/react-dom": "16.8.6",
-    "axios": "0.19.0",
+    "axios": "0.21.1",
     "blueimp-load-image": "2.21.0",
     "connected-react-router": "6.4.0",
     "firebase": "6.0.4",
